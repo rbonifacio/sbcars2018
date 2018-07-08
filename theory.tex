@@ -132,7 +132,7 @@ implements  algorithms to manipulate the knowledge represented in the knowledge 
 The knowledge base stores facts and rules~\cite{hayesRoth1985}. Fact is an usually static statement about properties, relations, 
 or propositions~\cite{hayesRoth1985} and should be something relevant to the initial state of the system~\cite{grosan2011}. 
 A rule is a conditional statement that links certain conditions to actions or results \cite{abraham2005}, being able to express 
-policies, preferences, and constraints~\cite{gilman2015}. Rules can be used to express deductive knowledge, 
+policies, preferences, and constraints. Rules can be used to express deductive knowledge, 
 such as logical relationships, and thus support inference, verification, or evaluation tasks~\cite{hayesRoth1985}.
 
 A rule `if-then' takes a form like \emph{``if x is A then take a set of actions''}. 
@@ -189,7 +189,7 @@ is to abstract the use of a specific language for implementing the
 approaches for metaprogramming, including preprocessing, source to source 
 transformations, and template engines. 
 A template engine is a generic tool for generating textual output from templates and data 
-files~\cite{he2009}. They can be used 
+files. They can be used 
 in the development of software that requires the automatic generation of code 
 according to specific purposes~\cite{benato2017}. 
 
@@ -201,7 +201,7 @@ being one of the main techniques to generate source code from high level specifi
 recently, languages such as Clojure, Ruby, Scala and Haskell adopted the use of template and quasiquote 
 mechanisms as a reuse and program generation strategies (some of them considering type systems).
 A template is a text document that 
-combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{arnoldus2007,segura2017}. 
+combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{segura2017}. 
 
 In this work we use the Freemarker template engine, which is an open-source software designed to 
 generate text from templates~\cite{radjenovic2009}. Freemarker was chosen for several reasons, 
@@ -211,10 +211,10 @@ need to (re)compile the application~\cite{benato2017,parr2006}.
 
 \subsection{Domain Specific Language}
 
-A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010,bentley1987}. 
+A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010}. 
 Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specializing 
 in languages~\cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts 
-appropriately to the phrases and input symbols it discovers~\cite{parr2013}.
+appropriately to the phrases and input symbols it discovers.
 The need for new languages for many growing domains is increasing, as well as the emergence of more sophisticated 
 tools that allow software engineers to define a new language with reasonable effort. As a result, a growing number of DSLs 
 are being developed to increase developer productivity within specific domains~\cite{karsai2014}. 
