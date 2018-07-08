@@ -1,0 +1,6 @@
+*.log
+*.bbl
+*.tex~
+*.blg
+main.pdf
+*.aux

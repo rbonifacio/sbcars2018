@@ -1,0 +1,192 @@
+%%%% Proceedings format for most of ACM conferences (with the exceptions listed below) and all ICPS volumes.
+%%%% As of March 2017, [siggraph] is no longer used. Please use sigconf (above) for SIGGRAPH conferences.
+%%%% Proceedings format for SIGPLAN conferences 
+% \documentclass[sigplan, anonymous, review]{acmart}
+%%%% Proceedings format for SIGCHI conferences
+% \documentclass[sigchi, review]{acmart}
+%%%% To use the SIGCHI extended abstract template, please visit
+% https://www.overleaf.com/read/zzzfqvkmrfzn
+
+%\documentclass[sigplan, anonymous, review]{acmart}
+\documentclass[sigconf]{acmart}
+%\documentclass[sigconf, anonymous, review]{acmart}
+%\documentclass[sigconf]{acmart}
+
+\usepackage{booktabs} % For formal tables
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{xspace}
+
+\usepackage{listings}
+\lstset{   
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  frame=single,	                   % adds a frame around the code
+  xleftmargin=2em,
+  framexleftmargin=1.5em,
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style  
+  morekeywords={rule, type, materials, cond, values, conditions, when, then, end},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers  
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  %showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  %showstringspaces=false,          % underline spaces within strings only
+  %showtabs=false,                  % show tabs within strings adding particular underscores
+  %stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  %stringstyle=\color{mymauve},     % string literal style
+  %tabsize=2,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+%TODO: remover esses pacotes qdo traduzir para ingles
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+
+% Copyright
+%\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+\setcopyright{rightsretained}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+
+
+% DOI
+\acmDOI{10.475/123_4}
+
+% ISBN
+\acmISBN{123-4567-24-567/08/06}
+
+%Conference
+\acmConference[SBCARS 2018]{12th Brazilian Symposium on Software Components, Architectures, and Reuse}{September 2018}{S\~{a}o Carlos, S\~{a}o Paulo, Brazil}
+\acmYear{2018}
+\copyrightyear{2018}
+
+\acmArticle{4}
+\acmPrice{15.00}
+
+%\acmBadgeL[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+%\acmBadgeR[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+
+
+\begin{document}
+\title{Distribution of Military Employment Materials: A Case Study in the Brazilian Army}
+
+% \author{Pedro Henrique Teixeira Costa, Edna Dias Canedo and Rodrigo Bonif\'{a}acio de Almeida}
+% \email{pedro.costa@aluno.unb.br, ednacanedo@unb.br, rbonifacio@unb.br}
+% \affiliation{
+%  \institution{Computer Science Department, University of Bras\'{i}lia - (UnB)}
+%  \streetaddress{P.O. Box 4466}
+%  \city{Bras\'{i}lia}
+%  \state{DF}
+%  \postcode{70910-900}
+% }
+
+% \renewcommand{\shortauthors}{Costa et al.}
+
+\newcommand{\callers}{\emph{high-level rules}\xspace}
+\newcommand{\shc}{HLR\xspace}
+
+\begin{abstract}
+
+% Distribuição de materiais é um tema comum na área de logística. A distribuição de Materiais de Emprego Militar (MEM) no Exército Brasileiro envolve a catalogação de materiais, a definição de regras que associam MEMs a unidades organizacionais, e a execução das regras para derivar os materiais previstos para cada unidade militar, listados no Quadro de Material Previsto (QDM). Atualmente, o QDM é gerado quase que totalmente de forma manual através do preenchimento de planilhas eletrônicas para cada Organização Militar (OM). O objetivo deste trabalho é apresentar a solução desenvolvida para geração automática de QDMs a partir da definição de regras de distribuição e posterior execução em um motor de regras. A simplicidade na definição das regras de distribuição de materiais, transformando definições de alto nível em definições baseadas em regras de motor de inferência, facilita a manutenção e extrai tais definições do código fonte de uma aplicação. Isso motivou o uso de programação generativa, em termos de meta-programação, e um motor de inferência específico para a linguagem Java. Embora seja específica para a 4ª Subchefia do Estado-Maior do Exército (EME), a solução tende a ser genérica o suficiente para ser adotada, após algumas adaptações, por outras áreas do exército ou até mesmo organizações externas que lidam com regras de distribuição de materiais semelhantes.
+
+In this paper we present the main design and architectural decisions to build an enterprise system that deals with the distribution of equipments to the Brazilian Army. The requirements of the system are far from trivial, and  
+we have to conciliate the need to extract business rules from the source code (increasing software flexibility) with the requirements of not exposing the use of a declarative languages to create an inference engine 
+and simplifying the tests of the application. Considering these goals, we present in this paper a seamless integration of meta-programming and domain-specific languages. The use of meta-programming allowed us to isolate and abstract all definitions necessary to externalize the business rules that ensures 
+the correct distribution of the equipments through the Brazilian Army departments. 
+The use of a domain specific language simplified the process of writing automatic 
+test cases related to our domain. Although our architecture target the specific needs of the Brazilian Army, we believe that logistic systems from other institutions might benefit from our decisions. 
+
+\end{abstract}
+
+%
+% The code below should be generated by the tool at
+% http://dl.acm.org/ccs.cfm
+% Please copy and paste the code instead of the example below.
+%
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10010405.10010406.10010423</concept_id>
+<concept_desc>Applied computing~Business rules</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010405.10010476.10010478</concept_id>
+<concept_desc>Applied computing~Military</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010147.10010178.10010187</concept_id>
+<concept_desc>Computing methodologies~Knowledge representation and reasoning</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011006.10011041.10011047</concept_id>
+<concept_desc>Software and its engineering~Source code generation</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011006.10011050.10011023</concept_id>
+<concept_desc>Software and its engineering~Specialized application languages</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+<concept>
+<concept>
+<concept_id>10011007.10010940.10010971.10010972.10010539</concept_id>
+<concept_desc>Software and its engineering~n-tier architectures</concept_desc>
+<concept_significance>100</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011074.10011081.10011082.10011083</concept_id>
+<concept_desc>Software and its engineering~Agile software development</concept_desc>
+<concept_significance>100</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Applied computing~Business rules}
+\ccsdesc[500]{Applied computing~Military}
+\ccsdesc[300]{Computing methodologies~Knowledge representation and reasoning}
+\ccsdesc[300]{Software and its engineering~Source code generation}
+\ccsdesc[300]{Software and its engineering~Specialized application languages}
+\ccsdesc[100]{Software and its engineering~n-tier architectures}
+\ccsdesc[100]{Software and its engineering~Agile software development}
+
+
+\keywords{Business Rules, Rule Engine, Generative Programming, Military Logistics}
+
+%\begin{teaserfigure}
+%  \includegraphics[width=\textwidth]{tmp/sampleteaser}
+%  \caption{This is a teaser}
+%  \label{fig:teaser}
+%\end{teaserfigure}
+
+
+\maketitle
+
+\input{introduction}
+%\input{methodology}
+\input{theory}
+%\input{requirements}
+\input{architecture} 
+\input{empirical-study} 
+\input{conclusion}
+
+% \section{Acknowledgments}
+% \label{sec:Acknowledgments}
+
+% The authors would like to thank the Brazilian Army for their support to this work and to allow our University to conduct this research in the context of a real software modernization effort (FUB / CIC 6138/2016).
+
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bibliography}
+
+\end{document}

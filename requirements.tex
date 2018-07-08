@@ -1,0 +1,29 @@
+\section{Requisitos Arquiteturais do SISDOT}\label{sec:requirements}
+
+Este trabalho propõe uma solução arquitetural para a modernização do Sistema de Dotação de Material de Emprego Militar (SISDOT) do Exército Brasileiro. O SISDOT é responsável por manter todos os materiais utilizados pelo Exército Brasileiro (EB), como por exemplo: cantil, fuzil, metralhadora, combustível, viaturas, dentre outros. Estes materiais na maioria das vezes são de uso individual ou coletivo, e em alguns casos essenciais para o exercício das atividades de uma Organização Militar (OM). A estrutura de cada OM é detalhada por um documento que detalha os cargos que preenchem sua estrutura organizacional, o Quadro de Cargos (QC) \cite{brasil2015}.
+
+O SISDOT além de manter o tipo, classe e família dos materiais, é responsável por gerar uma lista de todos os materiais de emprego militar que serão distribuídos nas Organizações Militares do Exército Brasileiro, de acordo com os seus cargos. Essa lista é denominada de "Chamador". O Chamador é utilizado para que possa ser efetuado o Quadro de Dotação de Material (QDM). O QDM por sua vez é usado para a geração do Quadro de Dotação de Material Previsto (QDMP). 
+
+O Quadro de Dotação de Material (QDM) é o documento, baseado no QC, que prevê a quantidade de MEM necessária ao cumprimento das atividades estabelecidas na base doutrinária da OM operativa \cite{brasil2015}. O QDM é de fundamental importância para as atividades do EB uma vez que o mesmo determina as Normas de Dotação (ND) dos materiais de emprego militar, ou seja, uma norma de dotação classifica o cargo do militar e o material que o mesmo necessita para executar o seu trabalho, seja esse material de uso individual ou de uso coletivo. Além disso, um material também pode ser de uso essencial para o exercício da atividade militar.
+
+\textbf{As Normas de Dotação} (ND) são regras que orientam o estabelecimento da distribuição dos diversos materiais militares (denominados Itens Genéricos --IG) por cargos e frações de uma organização militar. Quando a ND é padronizada, ou seja, tem um alcance generalizado para um Cargo e ou uma Fração, a ND deve descrever essa propriedade/intenção. Por exemplo, IG (10201009 -- Equipamento de Uso Individual Completo) -- ND = 1, significa que será distribuído 1 por militar em uma OM do tipo Operacional. Neste caso, verifica-se que o alcance dessa ND atinge a todos os militares das Organizações Militares Operacionais.
+
+A modernização do SISDOT compreende novas funcionalidades, bem como melhorias em funcionalidades existentes no sistema atual. As principais funcionalidades do SISDOT são:
+
+\begin{itemize}
+
+\item Cadastrar Tipo de Material;
+Cadastrar Classe de Material;
+Cadastrar Família de Material;
+Cadastrar Material de Emprego Militar;
+Gerar Chamador -- Editar, Clonar e Excluir;
+Gerar QDM -- Editar, Clonar, Validar, Revogar ou Excluir;
+Gerar QDMP --  Editar, Clonar, Validar, Revogar ou Excluir;
+Cadastrar Norma de Dotação Provisória
+Gerar Norma de Dotação a partir do Chamador;
+Cadastrar Siglas;
+Cadastrar Observação;
+Cadastrar Síntese;
+Gerar Relatórios -- Materiais, Chamador, Norma de Distribuição, QDM e QDMP.
+\end{itemize}
+
