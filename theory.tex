@@ -1,4 +1,4 @@
-\section{Logistics Systems}
+\section{Logistics Systems}\label{sec:logistics}
 
 Logistics is the method used to implement military strategies and tactics as a method to gain 
 competitive advantage~\cite{rutner2012}. Logistics is defined as the art of moving armies, 
@@ -7,162 +7,229 @@ provide the framework for conducting military operations, while logistics provid
 In the context of this paper, we are more interested in the supplying aspects of logistics. 
 The logistics supplying function refers to the set of activities that deals with the  provisioning of 
 the material of different classes (including vehicles, armaments, munition, uniform, and fuel) necessary to the 
-military unities (including a rich organizational structure and a huge number of solders). 
+military unities (including a rich organizational structure and a huge number of soldiers). 
 
 In order to facilitate the administration and control of materials and equipaments, the Brazilian Army uses a 
-catalog system that is similar to one defined by North Atlantic Treaty Organization (OTAN)~\cite{otan2012}, 
+catalog system that is similar to one defined by the North Atlantic Treaty Organization (OTAN)~\cite{otan2012}, 
 which classifies items into groups and classes. Instead, to support the provisioning of materials and equipaments, 
 the Brazilian Army catalog uses a classification that considers the \emph{type}, \emph{class}, and \emph{family} of the 
-materials, ignoring some details (such as specific brands and suppliers). More detailed information are considered by 
+materials, ignoring some details (such as specific brands and suppliers). More detailed information is considered by 
 other areas of the logistic system~\cite{brasil2003}. Several rules govern the identification of materials and equipaments, 
-to avoid dupplication and simplify the decision make processes. 
-A logistic system is the integrated set of organizations, personnel, principles, and technical standards intended to provide 
-the adequate flow for supplying materials~\cite{brasil2003}. The organization and operation of the system 
-presuppose \cite{brasil2003}:
+to avoid duplication and simplify the process of decision making. A logistic system is the integrated set of organizations, 
+personnel, principles, and technical standards intended to provide the adequate flow for supplying materials~\cite{brasil2003}. 
+This is a complex system, and thus must be organized in different modules. 
+
+In this paper we present the main design and architectural decisions related to one of the modules (SISDOT) of the \emph{Integrated 
+Logistics System} (SIGELOG) of the Brazilian Army. SISDOT deals with the identification of the necessary 
+materials and equipaments (hereafter MEMs) for the organizational unities of the Brazilian Army. Each organizational 
+unity is a combination of a set of \emph{generic organizations of specific types}, which describes the expected 
+number of military unities of an organization (including armies, divisions, brigades, and so on). The goal of 
+SISDOT is to estimate the set of MEMs that should be assigned to a generic organization, producing 
+one if its main products (named QDM). Based on a set of QDMs, SISDOT then derives another estimate 
+of MEMs that should be assigned to a concrete organizational unity (a QDMP). 
+
+Before generating a QDM, it is necessary to catalog all relevant MEMs to a given 
+class of materials and then specify \callers (HLRs) that relate MEMs to the generic organizational 
+unities, considering different elements of the structure---from the type of the unity and 
+sub-unities to the qualifications of a soldier. {\color{red}That is, is is possible to elaborate a 
+\shc that states that a military ambulance would be assigned to all \emph{paratrooper and lightweight infantries}. 
+Differently, it is also possible to state that an automatic rifle will be assigned to all \emph{sergeant that has 
+been qualified as a shooter}.}. There is some degree of flexibility for writing these 
+rules, that might be from two different kinds: rules that consider the entire structure 
+of the Brazilian Army and rules that refer to specific elements of the organizational 
+structure. The former details rules that are more specific for a set of military qualifications. The second allows 
+the generation of rules that might be reused through different unities. 
+
+Deriving QDMs and QDMPs is not trivial and its complexity is due to several 
+factors, including the rich organizational structure of the Brazilian Army, 
+the huge number of existing functions and qualifications that must be 
+considered, and the reasonable number of MEMs. The process might also vary 
+depending on the class of the materials. Moreover, it is possible to specify the  
+\callers in different ways, which in the end might interact to each other leading 
+to undesired results (e.g., the same material being assigned several times 
+to a given soldier). 
+
+Due to number of logic decisions, using an imperative language to implement the process of QDM generation 
+is not an interesting choice. However, the SIGELOG architecture constraints the development 
+to use the Java Enterprise Edition platform---so we had little space to introduce a 
+more suitable language (such as Prolog) to generate QDMs. Other constraints guided 
+the architectural decisions of SISDOT:  
 
 \begin{itemize}
-\item Planning and supervision of all actions related to the supplying management;
-\item Request and delivery standards that provide promptness in order to meet needs with opportunity;
-\item Control that provides all the information pertinent to the inventory situation and the comparison of the needs with the availability;
-\item Executive Bodies, at the various levels of command, responsible for procurement and distribution;
-\item Personnel and facilities to receive, store and distribute the several items;
-\item Use of as few intermediate facilities as possible, seeking to minimize the handling of items.
+\item Maintenance: the set of languages and libraries are limited to those already used in the SIGELOG development.  
+\item Performance: considering a total of 1000 \callers, the system must be able to generate a QDM in less than 5 seconds.
+\item Testing: the technical decisions must not compromise the testability of the system, being expected a high degree of automated tests. 
 \end{itemize}
 
-The inventory levels foreseen in the system are maintained by an automatic supply system. For this, calculation instruments are used, such as tables of material endowment, consumption factors, supply and replacement, tables, among others. When special adjustment needs arise, requests are made for the adequacy of the distribution of supplies \cite{brasil2003}.
+To deal with the first constraint, we decided to use a meta-programming approach that derives 
+\emph{low-level rules} for Drools (a rule based engine for Java) \emph{on the fly}, from a set of \callers represented 
+as domain objects that must exist in a database. In this way, it is not necessary to understand 
+the language used to specify rules in Drools. Surely, although this approach increases flexibility and  
+allowed us to externalize the \emph{low-level rules}, it might introduce some undesired effect on 
+the performance of the system: we generate all low-level rules every time a QDM is built. We are using 
+a cache mechanism and performance tests (as we discuss in Section~\ref{sec:case_study}) 
+shows that our architecture fulfills the second constraint. For the third constraint, we implemented a DSL that simplifies the specification and 
+execution of test cases. In Sections~\ref{sec:brs} and~\ref{sec:gp} 
+we introduce some technical background that might help the reader to understand 
+the design and architectural decisions we take while implementing SISDOT.  
+ 
+%% \subsection{Software Architecture}
 
-\subsection{Software Architecture}
+%% % Arquitetura de software se tornou mais ampla e complexa devido às características dos sistema atuais, tais como: distribuídos e interconectados, escaláveis horizontalmente e prontos para um ambiente de computação em nuvem, publicados automaticamente em ambientes diversos, atualizáveis com mínimo de downtime, resilientes e adaptativos \cite{hohpe2016}. Há também uma diferença em relação à abordagem tradicional, que trata a arquitetura como um conjunto de componentes e conectores, ao tratar a arquitetura como um conjunto de decisões arquiteturais realizadas no sistema \cite{bosch2004}, \cite{jansen2005}.
 
-% Arquitetura de software se tornou mais ampla e complexa devido às características dos sistema atuais, tais como: distribuídos e interconectados, escaláveis horizontalmente e prontos para um ambiente de computação em nuvem, publicados automaticamente em ambientes diversos, atualizáveis com mínimo de downtime, resilientes e adaptativos \cite{hohpe2016}. Há também uma diferença em relação à abordagem tradicional, que trata a arquitetura como um conjunto de componentes e conectores, ao tratar a arquitetura como um conjunto de decisões arquiteturais realizadas no sistema \cite{bosch2004}, \cite{jansen2005}.
+%% Software architecture has become more extensive and complex due to the characteristics of the current systems, such as: distributed and interconnected, scalable horizontally and ready for a cloud computing environment, automatically published in diverse, updatable environments with minimal downtime, resilient and adaptive \cite{hohpe2016}. There is also a difference from the traditional approach, which treats architecture as a set of components and connectors, by treating architecture as a set of architectural decisions made in the system \cite{bosch2004}, \cite{jansen2005}.
 
-Software architecture has become more extensive and complex due to the characteristics of the current systems, such as: distributed and interconnected, scalable horizontally and ready for a cloud computing environment, automatically published in diverse, updatable environments with minimal downtime, resilient and adaptive \cite{hohpe2016}. There is also a difference from the traditional approach, which treats architecture as a set of components and connectors, by treating architecture as a set of architectural decisions made in the system \cite{bosch2004}, \cite{jansen2005}.
+%% % Arquitetura de software é um conjunto de estruturas necessárias para raciocinar sobre um sistema, que compreendem elementos de software, relações entre eles e propriedades de ambos \cite{bass2013software}. Existem três categorias de estruturas arquiteturais \cite{clements2011documenting}, \cite{bass2013software}. A arquitetura de software está relacionada diretamente aos atributos de qualidade do sistema; permite raciocinar sobre o impacto de mudanças enquanto o sistema evolui; a documentação da arquitetura melhora a comunicação entre os interessados e serve como base de treinamento de novos membros da equipe; serve como uma receita para a implementação do sistema; ajuda no planejamento de custos e cronograma de atividades; possibilita o reuso de soluções \cite{bass2013software}. 
 
-% Arquitetura de software é um conjunto de estruturas necessárias para raciocinar sobre um sistema, que compreendem elementos de software, relações entre eles e propriedades de ambos \cite{bass2013software}. Existem três categorias de estruturas arquiteturais \cite{clements2011documenting}, \cite{bass2013software}. A arquitetura de software está relacionada diretamente aos atributos de qualidade do sistema; permite raciocinar sobre o impacto de mudanças enquanto o sistema evolui; a documentação da arquitetura melhora a comunicação entre os interessados e serve como base de treinamento de novos membros da equipe; serve como uma receita para a implementação do sistema; ajuda no planejamento de custos e cronograma de atividades; possibilita o reuso de soluções \cite{bass2013software}. 
+%% Software architecture is a set of structures necessary to reason about a system, which comprise elements of software, relations between them and properties of both \cite{bass2013software}. There are three categories of architectural structures \cite{clements2011documenting}, \cite{bass2013software}. The software architecture is directly related to the quality attributes of the system; it allows to reason about the impact of changes as the system evolves; architecture documentation improves communication among stakeholders and serves as a training base for new team members; serves as a recipe for the implementation of the system; help with cost planning and schedule of activities; enables the reuse of solutions \cite{bass2013software}.
 
-Software architecture is a set of structures necessary to reason about a system, which comprise elements of software, relations between them and properties of both \cite{bass2013software}. There are three categories of architectural structures \cite{clements2011documenting}, \cite{bass2013software}. The software architecture is directly related to the quality attributes of the system; it allows to reason about the impact of changes as the system evolves; architecture documentation improves communication among stakeholders and serves as a training base for new team members; serves as a recipe for the implementation of the system; help with cost planning and schedule of activities; enables the reuse of solutions \cite{bass2013software}.
+%% % Os atributos de qualidade considerados relevantes para a arquitetura proposta neste trabalho são: 
 
-% Os atributos de qualidade considerados relevantes para a arquitetura proposta neste trabalho são: 
+%% The quality attributes considered relevant for the architecture proposed in this work are:
 
-The quality attributes considered relevant for the architecture proposed in this work are:
+%% \begin{itemize}
 
-\begin{itemize}
+%% % \item Simplicidade na definição das regras de distribuição de materiais, transformando definições de alto nível  em definições baseadas em regras de motor de inferência, o que facilita a manutenção e extrai tais definições do código fonte de uma aplicação. Isso motivou o uso de programação generativa (em termos de meta programação) e um motor de inferência específico para a linguagem Java;
 
-% \item Simplicidade na definição das regras de distribuição de materiais, transformando definições de alto nível  em definições baseadas em regras de motor de inferência, o que facilita a manutenção e extrai tais definições do código fonte de uma aplicação. Isso motivou o uso de programação generativa (em termos de meta programação) e um motor de inferência específico para a linguagem Java;
+%% \item Simplicity in defining material distribution rules by transforming high-level definitions into definitions based on inference engine rules, which facilitates maintenance and extracts such definitions from the source code of an application. This motivated the use of generative programming (in terms of meta programming) and an inference engine specific to the Java language;
 
-\item Simplicity in defining material distribution rules by transforming high-level definitions into definitions based on inference engine rules, which facilitates maintenance and extracts such definitions from the source code of an application. This motivated the use of generative programming (in terms of meta programming) and an inference engine specific to the Java language;
+%% % \item Facilidade para execução de testes automatizados, motivando a definição de uma Domain-Specific Languages (DSL) para descrever conceitos relacionados à dotação de materiais para o Exército Brasileiro. A partir DSL, são gerados casos de testes baseados em ``especificações executáveis'' e classes que instanciam objetos do domínio. 
 
-% \item Facilidade para execução de testes automatizados, motivando a definição de uma Domain-Specific Languages (DSL) para descrever conceitos relacionados à dotação de materiais para o Exército Brasileiro. A partir DSL, são gerados casos de testes baseados em ``especificações executáveis'' e classes que instanciam objetos do domínio. 
+%% \item Ease of execution of automated tests, motivating the definition of a Domain-Specific Languages (DSL) to describe concepts related to the endowment of materials for the Brazilian Army. From DSL, test cases are generated based on ``executable specifications'' and classes that instantiate objects of the domain.
 
-\item Ease of execution of automated tests, motivating the definition of a Domain-Specific Languages (DSL) to describe concepts related to the endowment of materials for the Brazilian Army. From DSL, test cases are generated based on ``executable specifications'' and classes that instantiate objects of the domain.
-
-\end{itemize}
+%% \end{itemize}
 
 
-\subsection{Rule Engine}
+%\section{Technical Background} 
+
+\section{Business Rules and Rule Based Engines}\label{sec:rbs}
 
 % Uma regra de negócio é uma declaração compacta, atômica e bem formada sobre um aspecto do negócio que pode ser expresso em termos que podem estar diretamente relacionados com o negócio e seus colaboradores, usando linguagem simples e não ambígua que é acessível a todas as partes interessadas: proprietário da empresa, analista de negócios, arquitetos, técnicos, cliente, dentre outros \cite{graham2007}. Esse tipo de estrutura é muito importante para as organizações, já que elas precisam lidar cada vez mais com  cenários complexos. Estes cenários são compostos por um grande número de decisões individuais, que trabalham em conjunto para fornecer uma avaliação complexa da organização como um todo \cite{salatino2016}.
 
-A business rule is a compact, atomic, and well-formed statement about an aspect of the business that can be expressed in terms that may be directly related to the business and its employees using simple and unambiguous language that is accessible to all stakeholders: business owner, business analyst, architects, technicians, client, among others \cite{graham2007}. This type of structure is very important for organizations, as they need to deal more and more with complex scenarios. These scenarios consist of a large number of individual decisions, working together to provide a complex assessment of the organization as a whole \cite{salatino2016}.
+The process for deriving QDMs consists of applying a set of business rules that 
+relates MEMs to the organizational structure of the Brazilian Army. In this paper, we named 
+this set of business rules as \callers. A business rule is a compact, atomic, and well-formed 
+statement about an aspect of the business that can be expressed in terms that may be 
+directly related to the business and its employees using simple and unambiguous language 
+that is accessible to all stakeholders: business owner, business analyst, architects, technicians, client, 
+among others \cite{graham2007}. This type of structure is very important for organizations, 
+as they need to deal more and more with complex scenarios. These scenarios consist of a 
+large number of individual decisions, working together to provide a 
+complex assessment of the organization as a whole \cite{salatino2016}.
 
 % Sistemas baseados em regras (Rule Based Systems -- RBS), também conhecidos como production systems ou expert systems, são a forma mais simples de inteligência artificial, usando regras como representação do conhecimento \cite{grosan2011}. Ao invés de representar o conhecimento de forma declarativa e estática como um conjunto de coisas que são verdadeiras, RBS representa o conhecimento em termos de um conjunto de regras que diz o que fazer ou o que concluir em diferentes situações \cite{grosan2011}. Essas regras são também conhecidas como: condição-ação, produções, situação-ação ou se-então \cite{russell2010}.
 
-Rule Based Systems (RBS), also known as production systems or expert systems, are the simplest form of artificial intelligence, using rules such as knowledge representation \cite{grosan2011}. Instead of representing knowledge in a declarative and static way as a set of things that are true, RBS represents knowledge in terms of a set of rules that tells what to do or what to accomplish in different situations \cite{grosan2011}. These rules are also known as: condition-action, productions, situation-action, or if-then \cite{russell2010}.
+Rule Based Systems (RBS), also known as production systems or expert systems, are the 
+simplest form of artificial intelligence that help to design solutions that reason about 
+and take actions from business rules (a feature that is interesting in the context of SISDOT), using rules such as knowledge representation~\cite{grosan2011}. 
+Instead of representing knowledge in a declarative and static way as a set of things that are true, 
+RBS represents knowledge in terms of a set of rules that tells what to do or what to accomplish in different 
+situations~\cite{grosan2011}. These rules are also known as condition-action, productions, situation-action, 
+or if-then \cite{russell2010}.
 
-% Expert Systems são sistemas que são capazes de oferecer soluções para problemas específicos em um determinado domínio ou que são capazes de dar conselhos, tanto de um modo quanto em um nível comparável ao de especialistas na área \cite{lucas1991}. Os especialistas tendem a expressar a maioria de suas técnicas de solução de problemas em termos de um conjunto de regras situação-ação, e isto sugere que sistemas baseados em regras deve ser o método de escolha para a construção de tais sistemas \cite{hayesRoth1985}. O apelo intuitivo das regras para resolver problemas mal estruturados resulta em regras que, muitas vezes, são fáceis para os não-programadores lerem e escreverem \cite{grossner1993}. Alguns problemas podem ser facilmente solucionados usando linguagens de programação tradicionais, enquanto escrever um sistema baseado em regras é a maneira mais fácil de resolver os outros problemas \cite{friedman2003}, dando um importante impulso ao desenvolvimento de sistemas especialistas similares em outras áreas de conhecimento \cite{lucas1991}.
+RBS consist of two basic elements: a \emph{knowledge base} to store knowledge and an \emph{inference engine} that 
+implements  algorithms to manipulate the knowledge represented in the knowledge base~\cite{grosan2011,lucas1991,gallacher1989}.
+The knowledge base stores facts and rules~\cite{hayesRoth1985}. Fact is an usually static statement about properties, relations, 
+or propositions~\cite{hayesRoth1985} and should be something relevant to the initial state of the system~\cite{grosan2011}. 
+A rule is a conditional statement that links certain conditions to actions or results \cite{abraham2005}, being able to express 
+policies, preferences, and constraints~\cite{gilman2015}. Rules can be used to express deductive knowledge, 
+such as logical relationships, and thus support inference, verification, or evaluation tasks~\cite{hayesRoth1985}.
 
-Expert Systems are systems that are capable of providing solutions to specific problems in a given domain or that are capable of giving advice, both in a way and at a level comparable to that of \cite{lucas1991} area experts. Experts tend to express most of their problem-solving techniques in terms of a set of situation-action rules, and this suggests that rule-based systems should be the method of choice for building such systems \cite{hayesRoth1985}. The intuitive appeal of rules to solve poorly structured problems results in rules that are often easy for non-programmers to read and write \cite{grossner1993}. Some problems can be easily solved using traditional programming languages, while writing a rules-based system is the easiest way to solve the other problems \cite{friedman2003}, giving an important impetus to the development of similar expert systems in other areas of knowledge \cite{lucas1991}.
+A rule `if-then' takes a form like \emph{``if x is A then take a set of actions''}. 
+The conditional part is known as antecedent, premise, condition, or left-hand-side (LHS). The other part 
+is known as consequent, conclusion, action, or right-hand-side (RHS)~\cite{grosan2011,abraham2005}. 
+Rules-based system works as follows~\cite{grosan2011}: it starts with a knowledge base, 
+which contains all appropriate knowledge coded using `if-then' rules, and a working memory, 
+which contain all data, assertions, and information initially known. The system examines all 
+rule conditions (LHS) and determines a subset of rules whose conditions are satisfied, based on the data 
+available at the working memory. From this information set, some of the rules are triggered. 
+The choice of rules is based on a conflict resolution strategy. When the rule is triggered, 
+all actions specified in its \texttt{then} clause (RHS) are executed. These actions can modify the 
+working memory, the rule base itself, or take whatever action that the system programmer chooses to include. 
+This \emph{trigger rule loop} continues until a termination criterion is met. This end criterion can be 
+given by the fact that there are no more rules whose conditions are satisfied or a rule 
+is triggered whose action specifies that the program should be finalized.
 
-% Todo RBS consiste de elementos básicos: uma \textbf{knowledge base} - KB) para armazenar o conhecimento, e o \textbf{inference engine}, também conhecido como rule engine, que possui algoritmos para manipular o conhecimento representado na base de conhecimento \cite{grosan2011}, \cite{lucas1991}, \cite{gallacher1989}, \cite{hayesRoth1985}, \cite{buchanan1983}, \cite{abraham2005}. A base de conhecimento armazena fatos e regras \cite{hayesRoth1985}. Fato é uma afirmação usualmente estática sobre propriedades, relações ou proposições \cite{hayesRoth1985} e deve ser algo relevante para o estado inicial do sistema \cite{grosan2011}. Uma regra é uma declaração condicional que vincula determinadas condições a ações ou resultados \cite{abraham2005}, podendo expressar políticas, preferências e restrições \cite{gilman2015}. As regras podem ser usadas para expressar o conhecimento dedutivo, como relacionamentos lógicos e, assim, suportar tarefas de inferência, verificação ou avaliação \cite{hayesRoth1985}.
+Drools is an example of a business logic integration platform (BLiP) written in the Java programming language and 
+that fits some requirements of SISDOT (in particular, its integration with Java and the Wildfly application 
+server). We use Drools as the \emph{rule-based system} in the QDM generation. However, to abstract the use 
+of a RBS, we generate the Drools rules using a meta-programming approach, a specific technique for 
+\emph{generative programming}. 
 
-All RBS consists of basic elements: a \textbf{knowledge base} (KB) to store knowledge, and inference engine, also known as rule engine, which has algorithms to manipulate the knowledge represented in the knowledge base \cite{grosan2011}, \cite{lucas1991}, \cite{gallacher1989}, \cite{hayesRoth1985}, \cite{buchanan1983}, \cite{abraham2005}. The knowledge base stores facts and rules \cite{hayesRoth1985}. Fact is an usually static statement about properties, relations, or propositions \cite{hayesRoth1985} and should be something relevant to the initial state of the system \cite{grosan2011}. A rule is a conditional statement that links certain conditions to actions or results \cite{abraham2005}, being able to express policies, preferences, and constraints \cite{gilman2015}. Rules can be used to express deductive knowledge, such as logical relationships, and thus support inference, verification, or evaluation tasks \cite{hayesRoth1985}.
+\section{Generative Programming}\label{sec:gp}
 
-% Uma regra se-então assume a forma ``se x é A então y é B''. A parte condicional (SE) é conhecida como: antecedente, premissa, condição ou left-hand-side (LHS). A outra parte é conhecida como: consequente, conclusão, ação ou right-hand-side (RHS) \cite{grosan2011}, \cite{abraham2005}. Existem alguns algoritmos que são utilizados em sistemas baseados em regras, como: LEAPS \cite{batory1994}, TREAT \cite{wang1992}, \cite{miranker1991}, PHREAK \cite{salatino2016}, além de variações do Rete \cite{forgy1982}, como: Rete-OO \cite{sottara2010}, \cite{salatino2016}, Rete-ADH \cite{kim2014} e Rete-ECA \cite{lee2014}.
+Generative Programming (GP) is related to the design and implementation of 
+software components that can be combined to generate specialized and highly 
+optimized systems, fulfilling specific requirements~\cite{czarnecki1998}. 
+With this approach, instead of developing solutions from scratch, domain-specific 
+solutions are generated from reusable software components \cite{arora2009}. 
+GP is applied on the manufacturing of software products from components in a system 
+in an automated way (and within economic constraints), i.e., how other industries have been 
+producing mechanical, electronic, and other goods for decades \cite{barth2002}.
+The main idea in GP is similar to the one that led people to switch from Assembly 
+languages to high-level languages. 
 
-A rule if-then takes the form ``if x is A then y is B''. The conditional part (SE) is known as: antecedent, premise, condition or left-hand-side (LHS). The other part is known as: consequent, conclusion, action or right-hand-side (RHS) \cite{grosan2011}, \cite{abraham2005}. There are some algorithms that are used in rule-based systems, such as: LEAPS \cite{batory1994}, TREAT \cite{wang1992}, \cite{miranker1991}, PHREAK \cite{salatino2016}, besides variations of the Rete \cite{forgy1982}, such as: Rete-OO \cite{sottara2010}, \cite{salatino2016}, Rete-ADH \cite{kim2014} and Rete-ECA \cite{lee2014}.
+In our context, we use GP to deal with two different aspects of SISDOT. First, 
+we raise the level of abstraction by automatically generating low-level Drools 
+rules from an existing set of \callers (previously defined by the domain experts). 
+This is a type of \emph{meta-programming} based on template engines---we use a 
+template to generate a set of facts and rules (which are the fundamental mechanisms of 
+logic programming) from domain objects. We also raise the level of abstraction to 
+assist developers in the specification and execution of test cases, using a 
+domain specific language and a set of customized libraries and tools.  
 
-% O sistema baseado em regras funciona da seguinte maneira \cite{grosan2011}: começa com uma base de conhecimento, que contém todo o conhecimento apropriado codificado em regras se-então, e uma memória de trabalho, que pode ou não conter inicialmente quaisquer dados, asserções ou informações inicialmente conhecidas. O sistema examina todas as condições da regra (LHS) e determina um subconjunto, o conjunto de conflitos, das regras cujas condições são satisfeitas com base na memória de trabalho. Deste conjunto de conflitos, uma dessas regras é acionada. A escolha da regra é baseada em uma estratégia de resolução de conflitos. Quando a regra é acionada, quaisquer ações especificadas em sua cláusula THEN (RHS) são executadas. Essas ações podem modificar a memória de trabalho, a própria base de regras ou fazer praticamente qualquer outra coisa que o programador do sistema decida incluir. Esse loop de regras de disparo e ações de execução continua até que um critério de finalização seja atendido. Esse critério de término pode ser dado pelo fato de que não há mais regras cujas condições são satisfeitas ou uma regra é disparada cuja ação especifica que o programa deve ser finalizado.
 
-The rules-based system works as follows \cite{grosan2011}: it starts with a knowledge base, which contains all appropriate knowledge coded in if-then rules, and a working memory, which may or may not initially contain any data, assertions or information initially known. The system examines all rule conditions (LHS) and determines a subset, the set of conflicts, of rules whose conditions are satisfied based on working memory. From this set of conflicts, one of these rules is triggered. The choice of rule is based on a conflict resolution strategy. When the rule is triggered, any actions specified in its THEN clause (RHS) are executed. These actions can modify the working memory, the rule base itself, or do almost anything else that the system programmer chooses to include. This trigger rules loop and execute actions continue until a termination criterion is met. This end criterion can be given by the fact that there are no more rules whose conditions are satisfied or a rule is triggered whose action specifies that the program should be finalized.
+\subsection{Metaprogramming and Template Engines}
 
-% O Drools é uma plataforma de integração de lógica de negócios (BLiP - Business Logic integration Platform), escrito na linguagem Java. É um projeto de código aberto que é apoiado pelo JBoss e Red Hat, Inc\cite{bali2009}. É licenciado sob a Licença Apache, Versão 2.0 \cite{browne2009}. Atualmente encontra-se na versão 7.7.0. Neste trabalho foi usado o módulo Drools Expert, usado para executar as regras, juntamente com o algoritmo PHREAK. Este algoritmo foi introduzido na versão 6 do Drools para abordar alguns dos principais problemas do Rete, incorporando todo o código existente de ReteOO e todos os seus aprimoramentos, além de ter sido inspirado em outros algoritmos, como: LEAPS, Rete/UL \cite{doorenbos1995} e Collection-Oriented Match \cite{acharya1993}. Apesar de ser uma evolução do algoritmo Rete, não é mais classificado como uma implementação Rete \cite{drools2017}.
+Metaprogramming concerns to the implementation of programs that 
+generate other programs. In the context of SISDOT, we use a metaprogramming 
+technique to generate programs that are interpreted by Drools. The main goal 
+is to abstract the use of a specific language for implementing the 
+\emph{low-level rules} used to generate QDMs. There are many different 
+approaches for metaprogramming, including preprocessing, source to source 
+transformations, and template engines. 
+A template engine is a generic tool for generating textual output from templates and data 
+files~\cite{he2009}. They can be used 
+in the development of software that requires the automatic generation of code 
+according to specific purposes~\cite{benato2017}. 
 
-Drools is a business logic integration platform (BLiP) written in the Java language. It is an open source project that is supported by JBoss and Red Hat, Inc \cite{bali2009}. It is licensed under the Apache License, Version 2.0 \cite{browne2009}. Currently it is in version 7.7.0. In this work it is used the Drools Expert module, used to execute the rules, along with the PHREAK algorithm. This algorithm was introduced in version 6 of Drools to address some of Rete's main problems, incorporating all existing ReteOO's code and all its enhancements, as well as being inspired by other algorithms, such as: LEAPS, Rete/UL \cite{doorenbos1995} and Collection-Oriented Match \cite{acharya1993}. Although it is an evolution of the Rete algorithm, it is no longer classified as a Rete implementation \cite{drools2017}.
+The need for dynamically generated web pages has led to the development of numerous template engines 
+in an effort to make web application development easier, improve flexibility, 
+reduce maintenance costs, and enable parallel encoding and development in HTML language. 
+In addition to being widely used in dynamic web page generation, templates are used in other tasks, 
+being one of the main techniques to generate source code from high level specifications. More 
+recently, languages such as Clojure, Ruby, Scala and Haskell adopted the use of template and quasiquote 
+mechanisms as a reuse and program generation strategies (some of them considering type systems).
+A template is a text document that 
+combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{arnoldus2007,segura2017}. 
 
-\subsection{Generative Programming}
+In this work we use the Freemarker template engine, which is an open-source software designed to 
+generate text from templates~\cite{radjenovic2009}. Freemarker was chosen for several reasons, 
+such as: it follows a general purpose model; it is faster than other template engines; it supports 
+shared variables and model loaders; and its templates can be loaded or reloaded at runtime without the 
+need to (re)compile the application~\cite{benato2017,parr2006}.
 
-% A maioria das tecnologias orientadas a objeto focam no desenvolvimento de sistemas únicos ao invés de famílias de sistemas. Portanto, elas não suportam adequadamente a reutilização de software, devido há algumas deficiências \cite{czarnecki1999}.  Design patterns e frameworks representam uma contribuição extremamente valiosa da tecnologia orientada a objeto para a reutilização de software \cite{gamma1994}. Frameworks de software são uma tecnologia de reuso de software que promove a reutilização de arquiteturas inteiras dentro de um domínio de aplicativo estritamente definido \cite{cechticky2003}. No entanto, elas ainda precisam ser acompanhadas por uma abordagem sistemática de engenharia para e com reuso \cite{czarnecki1999}.
+\subsection{Domain Specific Language}
 
-%Most object-oriented technologies focus on developing single systems rather than system families. Therefore, they do not adequately support software reuse, due to some weaknesses \cite{czarnecki1999}. Design patterns and frameworks represent an extremely valuable contribution of object-oriented technology to software reuse \cite{gamma1994}. Software frameworks are a software reuse technology that promotes the reuse of entire architectures within a strictly defined application domain \cite{cechticky2003}. However, they still need to be accompanied by a systematic engineering approach to and with reuse \cite{czarnecki1999}.
+A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010,bentley1987}. 
+Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specializing 
+in languages~\cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts 
+appropriately to the phrases and input symbols it discovers~\cite{parr2013}.
+The need for new languages for many growing domains is increasing, as well as the emergence of more sophisticated 
+tools that allow software engineers to define a new language with reasonable effort. As a result, a growing number of DSLs 
+are being developed to increase developer productivity within specific domains~\cite{karsai2014}. 
 
-% Generative Programming (GP) está relacionada ao projeto e implementação de componentes de software que podem ser combinados para gerar sistemas especializados e altamente otimizados, cumprindo requisitos específicos \cite{czarnecki1998}. Com esta abordagem, em vez de desenvolver as soluções a partir do zero, soluções específicas de domínio são geradas a partir de componentes de software reutilizáveis \cite{arora2009}. GP é aplicada sobre a fabricação de produtos de software a partir de componentes em um sistema de forma automatizada (e dentro de restrições econômicas), ou seja, a forma como outras indústrias têm produzido bens mecânicos, eletrônicos e outros por décadas \cite{barth2002}.
 
-Generative Programming (GP) is related to the design and implementation of software components that can be combined to generate specialized and highly optimized systems, fulfilling specific requirements \cite{czarnecki1998}. With this approach, instead of developing solutions from scratch, domain-specific solutions are generated from reusable software components \cite{arora2009}. GP is applied on the manufacturing of software products from components in a system in an automated way (and within economic constraints), i.e., how other industries have been producing mechanical, electronic and other goods for decades \cite{barth2002}.
+Domain Specific Languages (DSL) are specification languages or programming languages with high level of abstraction, 
+simple and concise \cite{raja2010}, focused on specific domains, and are designed to facilitate the construction of applications, 
+usually declaratively, with limited expressiveness lines of code, which solve these specific problems \cite{neeraj2017}. 
+A DSL is a computer language of limited expressiveness, through appropriate notations and abstractions, focused and generally 
+restricted to a specific problem domain \cite{fowler2013,vanDeursen2000}. DSLs have the 
+potential to reduce the complexity of software development by increasing the level of abstraction for a domain. 
+According to the application domain, different notations (textual, graphical, tabular) are used \cite{pfeiffer2008}.
 
-% A ideia principal na GP é semelhante àquela que levou as pessoas a mudar de linguagens Assembly para linguagens de alto nível. Isto é, elevando o nível de abstração com o qual um programador ou designer deve lidar e automatizar todas as traduções das abstrações de alto nível para os componentes de implementação. O nível de abstração é um dos atributos mais importantes de uma linguagem de programação \cite{paska2009}. Se a linguagem abstrair dos detalhes da implementação, o código pode ser mais facilmente entendido e verificado. Em técnicas GP, os programadores definem um modelo do sistema que apenas define o conteúdo dos dados e a lógica dos aplicativos. Então, programas semelhantes aos compiladores traduzem esses modelos para os programas ou códigos de máquina reais automaticamente. A partir dos compiladores tradicionais, pode haver vários compiladores de modelos que traduzem um único modelo para várias plataformas, dependendo das necessidades de diferentes usuários \cite{azimi2003}.
 
-The main idea in GP is similar to the one that led people to switch from Assembly languages to high-level languages. That is, raising the level of abstraction with which a programmer or designer must handle and automate all translations of high-level abstractions to the implementation components. The level of abstraction is one of the most important attributes of a programming language \cite{paska2009}. %If the language abstracts from the implementation details, the code can be more easily understood and verified. In GP techniques, programmers define a system model that only defines data content and application logic. Then, compiler-like programs translate these templates to the actual programs or machine codes automatically. From the traditional compilers, there may be several compilers of models that translate a single model to multiple platforms, depending on the needs of different users \cite{azimi2003}.
-
-% De acordo com Barth et al \cite{barth2002}, programação generativa é definida como um paradigma de desenvolvimento de software baseado na modelagem de famílias de sistemas de software que, dada uma especificação de requisitos, um intermediário ou produto final altamente customizado e otimizado pode ser automaticamente fabricado sob demanda a partir de implementação elementar e reutilizável. Os objetivos da GP são \cite{czarnecki1998}: diminuir a lacuna conceitual entre o código do programa e os conceitos de domínio; alcançar alta capacidade de reutilização e adaptabilidade; simplificar o gerenciamento de muitas variantes de um componente; e aumentar eficiência (tanto no espaço quanto no tempo de execução). Existem diversas técnicas de programação generativa e outros paradigmas com objetivos similares, tais como: Generic Programming, Domain-Specific Languages (DSLs), e Aspect-Oriented Programming (AOP) \cite{czarnecki1998}.
-
-%According to Barth et al \cite{barth2002}, generative programming is defined as a paradigm of software development based on modeling families of software systems that, given a specification of requirements, a highly customized and optimized intermediate or end product can be automatically fabricated on demand from elementary and reusable implementation. The objectives of GP are \cite{czarnecki1998}: to reduce the conceptual gap between program code and domain concepts; achieve high reusability and adaptability; simplify the management of many variants of a component; and increase efficiency (both in space and at run time). There are several generative programming techniques and other paradigms with similar objectives, such as: Generic Programming, Domain-Specific Languages (DSLs), and Aspect-Oriented Programming (AOP) \cite{czarnecki1998}.
-
-\subsubsection{Template Engine}
-
-% Conceitos independentes devem ser representados de forma independente e devem ser combinados apenas quando necessário. Quando esse princípio é violado, conceitos não relacionados são agrupados ou dependências desnecessárias são criadas. De qualquer forma, obtém-se um conjunto de componentes menos flexível a partir do qual os sistemas são compostos. Os templates fornecem uma maneira simples de representar uma ampla variedade de conceitos gerais e formas simples de combiná-los \cite{stroustrup1997}.
-
-%Independent concepts should be represented independently and should be combined only when necessary. When this principle is violated, unrelated concepts are grouped or unnecessary dependencies are created. Either way, a less flexible set of components is obtained from which the systems are composed. Templates provide a simple way to represent a wide variety of general concepts and simple ways to combine them \cite{stroustrup1997}.
-
-% De acordo com He and Zheng \cite{he2009}, template engine é uma ferramenta genérica para gerar uma saída textual a partir de arquivos de templates e dados. Podem ser usados no desenvolvimento de software que necessita da geração automática de código conforme propósitos específicos \cite{benato2017}. A necessidade de páginas da web geradas dinamicamente levou ao desenvolvimento de inúmeros templates engine na tentativa de tornar o desenvolvimento de aplicações web mais fácil, melhorar a  flexibilidade, reduzir os custos de manutenção, e permitir codificação em paralelo e desenvolvimento em Linguagem HTML. Estes atraentes benefícios, que têm impulsionado a proliferação de templates engine, derivam inteiramente de um único princípio: separar a especificação da lógica de negócio e do cálculo de dados de uma página, de como uma página exibe tais informações. Com especificações encapsuladas de forma separada, template engine promovem  reutilização de componentes, aparências plugáveis de sites, pontos únicos de mudança para componentes e alta clareza geral do sistema \cite{parr2004}.  
-
-According to He and Zheng \cite{he2009}, template engine is a generic tool for generating textual output from template and data files. They can be used in the development of software that requires the automatic generation of code according to specific purposes \cite{benato2017}. The need for dynamically generated web pages has led to the development of numerous engine templates in an effort to make web application development easier, improve flexibility, reduce maintenance costs, and enable parallel encoding and development in HTML language. These attractive benefits, which have boosted the proliferation of templates engine, derive entirely from a single principle: separate the specification of business logic and calculation of data from a page, from how a page displays such information. With separately encapsulated specifications, template engine promotes reuse of components, pluggable website appearances, single points of change for components, and high overall system clarity \cite{parr2004}.
-
-% Além de serem muito utilizados na geração dinâmica de páginas web, os templates são usados em outras tarefas, tais como: geração de classes Java \cite{arnoldus2007}, arquivos de configuração \cite{costa2015}, arquivos contendo comandos SQL, entre outros. Um template é um documento de texto que combina marcadores de posição (placeholders) e fórmulas linguísticas usadas para descrever algo em um domínio específico \cite{arnoldus2007}, \cite{segura2017}. Os templates facilitam a comunicação entre os profissionais, contribuindo para a disseminação da pesquisa e fornecem um guia útil para iniciantes\cite{segura2017}.
-
-In addition to being widely used in dynamic web page generation, templates are used in other tasks such as: generation of Java \cite{arnoldus2007} classes, configuration files \cite{costa2015}, files containing SQL commands, among others. A template is a text document that combines placeholders and linguistic formulas used to describe something in a specific domain \cite{arnoldus2007}, \cite{segura2017}. Templates facilitate communication among professionals, contribute to the dissemination of research, and provide a useful guide for beginners \cite{segura2017}.
-
-% O processo de geração de código baseado em templates utiliza, como entrada, templates e um conjunto de modelos (dados). A linguagem na qual o template é escrito é conhecida como metalinguagem \cite{arnoldus2011}. O template engine age como um avaliador para gerar código, podendo ser visto como um metaprograma pois manipula código \cite{arnoldus2011}. O modelo é um artefato que descreve o domínio da aplicação em um alto nível de abstração, em uma linguagem de programação ou de modelagem. O modelo é usado pelo avaliador para substituir os marcadores de posição em um template. Esses espaços reservados contêm expressões para obter dados do modelo \cite{arnoldus2007}.
-
-%The process of generation of code based on templates uses, as input, templates and a set of models (data). The language in which the template is written is known as metalanguage \cite{arnoldus2011}. The template engine acts as an evaluator to generate code, and can be seen as a metaprogram because it handles code \cite{arnoldus2011}. The model is an artifact that describes the domain of the application in a high level of abstraction, in a programming language or modeling. The template is used by the evaluator to replace placeholders in a template. These placeholders contain expressions to get data from the model \cite{arnoldus2007}.
-
-% Existem vários tipos de template engine: Tapestry, WebMacro, Velocity, PTG, UniT, Tea, WebObjects, FreeMarker, ColdFusion, Template Toolkit, Mason, Thymeleaf, e Pebble \cite{parr2004}. Neste trabalho foi utilizado o template engine Freemarker, que é um software open-source projetado para gerar texto a partir de templates \cite{radjenovic2009}. O Freemarker pode ser considerado o substituto do Apache Velocity e encontra-se na incubadora de projetos da Apache Software Foundation (ASF), que apoia o seu desenvolvimento e é amplamente usado nos projetos da família Apache, como o NetBeans \cite{wengner2016}.
-
-%There are several types of template engine: Tapestry, WebMacro, Velocity, PTG, UniT, Tea, WebObjects, FreeMarker, ColdFusion, Template Toolkit, Mason, Thymeleaf, and Pebble \cite{parr2004}. In this work we used the Freemarker template engine, which is an open-source software designed to generate text from templates \cite{radjenovic2009}. Freemarker can be considered the substitute for Apache Velocity and is in the Apache Software Foundation (ASF) project incubator, which supports its development and is widely used in Apache family projects such as NetBeans \cite{wengner2016}. 
-
-% O Freemarker foi escolhido por apresentar as seguintes vantagens: é um software de código aberto; é um modelo de propósito geral; é mais rápido que outros; fornece facilidades de uso (por exemplo, suporte JavaScript Object Notation (JSON), variáveis compartilhadas, carregadores de modelos, entre outros); possui suporte automatizado em Java IDE (Integrated Development Environment); seus templates não são compilados para classes, ou seja, um template pode ser carregado ou recarregado durante o tempo de execução sem reimplementar o aplicativo; e formata automaticamente valores numéricos, datas e horas de acordo com a localização (\textit{locale}) \cite{benato2017}, \cite{parr2006}.
-
-%In this work we used the Freemarker template engine, which is an open-source software designed to generate text from templates \cite{radjenovic2009}. Freemarker was chosen because it has the following advantages: it is open source software; it is a general purpose model; is faster than others; provides ease of use (for example, JavaScript Object Notation (JSON) support, shared variables, model loaders, and so on); has automated support in Java IDE (Integrated Development Environment); their templates are not compiled for classes, that is, a template can be loaded or reloaded at runtime without reimplementing the application; and automatically formats numeric values, dates and times according to location (locale) \cite{benato2017}, \cite{parr2006}.
-
-\subsubsection{Domain Specific Language}
-
-% Uma linguagem é um conjunto de sentenças válidas, servindo como mecanismo para expressar intenções \cite{parr2010}, \cite{bentley1987}.  A criação de uma nova linguagem é uma tarefa demorada, requer experiência, sendo geralmente realizada por engenheiros especializados em linguagens \cite{karsai2014}. Para implementar uma linguagem, deve-se construir uma aplicação que leia sentenças e reaja apropriadamente às frases e símbolos de entrada que descobre \cite{parr2013}. 
-
-A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010}, \cite{bentley1987}. Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specializing in languages \cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts appropriately to the phrases and input symbols it discovers \cite{parr2013}.
-
-% A necessidade de novas linguagens para vários domínios em crescimento está aumentando, assim como o surgimento de ferramentas mais sofisticadas que permitem aos engenheiros de software definir um novo idioma com um esforço razoável. Como resultado, um número crescente de DSLs estão sendo desenvolvidas para aumentar a produtividade dos desenvolvedores dentro de domínios específicos \cite{karsai2014}. Com sua forte relação com as técnicas de engenharia dirigidas por modelos, elas agora estão recebendo mais atenção com o uso em diferentes áreas relacionadas ao software, sendo orientadas a negócios ou técnicas \cite{collet2014}.
-
-The need for new languages for many growing domains is increasing, as well as the emergence of more sophisticated tools that allow software engineers to define a new language with reasonable effort. As a result, a growing number of DSLs are being developed to increase developer productivity within specific domains \cite{karsai2014}. %With their strong relationship with model-driven engineering techniques, they are now receiving more attention with use in different areas related to the software, being business or technical oriented \cite{collet2014}.
-
-% Domain Specific Languages (DSL) são idiomas de especificação ou linguagens de programação com alto nível de abstração, simples e concisas \cite{raja2010}, focadas em domínios específicos, sendo projetadas para facilitar a construção de aplicativos, usualmente de forma declarativa, com expressividade limitada e linhas reduzidas de código, que resolvem esses problemas específicos \cite{neeraj2017}. Uma DSL é uma linguagem de programação de computadores de expressividade limitada, por meio de notações e abstrações apropriadas, focada e geralmente restrita a um domínio de problema específico \cite{fowler2013}, \cite{vanDeursen2000}. DSLs têm o potencial de reduzir a complexidade do desenvolvimento de software, aumentando o nível de abstração para um domínio. De acordo com o domínio da aplicação, diferentes notações (textual, gráfica, tabular) são usadas \cite{pfeiffer2008}.
-
-Domain Specific Languages (DSL) are specification languages or programming languages with high level of abstraction, simple and concise \cite{raja2010}, focused on specific domains, and are designed to facilitate the construction of applications, usually declaratively, with limited expressiveness lines of code, which solve these specific problems \cite{neeraj2017}. A DSL is a computer language of limited expressiveness, through appropriate notations and abstractions, focused and generally restricted to a specific problem domain \cite{fowler2013}, \cite{vanDeursen2000}. DSLs have the potential to reduce the complexity of software development by increasing the level of abstraction for a domain. According to the application domain, different notations (textual, graphical, tabular) are used \cite{pfeiffer2008}.
-
-% Programação orientada a linguagem é um estilo geral de desenvolvimento que opera sobre a ideia de construir software em torno de um conjunto de linguagens específicas de domínio \cite{fowler2005}. Várias áreas do sistema são identificadas e uma DSL é criada para cada uma dessas áreas identificadas \cite{fowler2008}.
-
-%Language-oriented programming is a general style of development that operates on the idea of building software around a set of domain-specific languages \cite{fowler2005}. Several areas of the system are identified and a DSL is created for each of these identified areas \cite{fowler2008}.
-
-% Language workbench é um termo para descrever uma nova classe de ferramentas de desenvolvimento de software, projetadas para construir software através de um ambiente rico de múltiplas e integradas DSLs \cite{fowler2008}. Essas ferramentas apoiam a definição, reutilização e composição eficientes de linguagens e suas IDEs (Integrated Development Environment), tornando acessível o desenvolvimento de novas linguagens e apoiando a programação orientada a linguagem, na qual conjuntos de linguagens sintática e semanticamente integradas podem ser construídos com um esforço comparativamente pequeno \cite{erdweg2013}. Uma característica de uma language workbench é a capacidade de editar a representação abstrata de um programa, em oposição à maneira convencional de manipular arquivos de texto para modificar um programa \cite{schmitt2014}.
-
-%Language workbench is a term to describe a new class of software development tools, designed to build software through a rich environment of multiple and integrated DSLs \cite{fowler2008}. These tools support the efficient definition, reuse and composition of languages and their Integrated Development Environment (IDEs), making the development of new languages accessible and supporting language-oriented programming, in which syntactically and semantically integrated sets of languages can be constructed with a comparatively small effort \cite{erdweg2013}. A feature of a language workbench is the ability to edit the abstract representation of a program, as opposed to the conventional way of manipulating text files to modify a program \cite{schmitt2014}.
-
-% O uso das linguagens workbenches está crescendo, bem como o número e variedade das próprias workbenches. Uma desvantagem desse crescente número de sistemas é que a terminologia usada e os recursos suportados por diferentes workbenches são tão diferentes que tanto os usuários quanto os desenvolvedores devem se esforçar para entender os princípios comuns e as decisões de projeto \cite{erdweg2015}. Alguns exemplos de language workbenches \cite{schmitt2014}, \cite{erdweg2013}: JastAdd, Rascal, Spoofax, Xtext, Jetbrains MPS e Intentional. Conforme definido por Bettini \cite{bettini2016}, Xtext é um framework do Eclipse \cite{gallardo2003}, \cite{kulkarni2015} para implementar GPLs e DSLs. Permite implementar linguagens rapidamente e, acima de tudo, abrange todos os aspectos de uma infraestrutura de linguagem completa, a partir do parser, gerador de código ou intérprete, até uma integração completa do Eclipse IDE com todos os recursos típicos.
-
-%The use of workbenches languages is growing, as well as the number and variety of the workbenches themselves. A disadvantage of this growing number of systems is that the terminology used and the features supported by different workbenches are so different that users and developers alike must strive to understand common principles and design decisions \cite{erdweg2015}. Some examples of language workbenches \cite{schmitt2014}, \cite{erdweg2013}: JastAdd, Rascal, Spoofax, Xtext, Jetbrains MPS and Intentional. As defined by Bettini \cite{bettini2016}, Xtext is an Eclipse framework \cite{gallardo2003}, \cite{kulkarni2015} to implement GPLs and DSLs. Lets you implement languages quickly and, above all, covers all aspects of a complete language infrastructure, from the parser, code generator or interpreter, to a full integration of the Eclipse IDE with all the typical features.
-
-% Para iniciar uma implementação DSL, o Xtext só precisa de uma especificação gramatical semelhante à ANTLR. A partir dessa gramática são gerados o lexer, parser, o modelo AST (Abstract Syntax Tree), a construção do AST para representar o programa analisado e o editor do Eclipse com todos os recursos do IDE. Todas as preocupações do próprio Xtext e do código gerado pelo Xtext podem ser customizadas via injeção de dependência \cite{prasanna2009}. Para as mais preocupantes, o comportamento padrão do Xtext geralmente é bom. Para as preocupações que precisam de customização (validação, vinculação/escopo, entre outros), o Xtext fornece uma API fácil de usar. O Xtext utiliza intensamente o EMF (Eclipse Modeling Framework) \cite{blewitt2013}. A AST criada pelo parser do Xtext é um modelo EMF. O modelo Ecore correspondente pode ser derivado automaticamente da gramática ou ser especificado explicitamente. Assim, o Xtext permite fácil integração com ferramentas do ecossistema Eclipse Modeling, como as linguagens de transformação Model-to-Model ou Model-to-Text. Outro exemplo é integrar o Xtext com ferramentas gráficas como o GMF (Graphical Modeling Framework) \cite{eysholdt2010}.
-
-%To start a DSL implementation, Xtext only needs a grammatical specification similar to ANTLR. From this grammar are generated the lexer, parser, AST (Abstract Syntax Tree) model, the construction of AST to represent the analyzed program and the Eclipse editor with all IDE resources. All the concerns of Xtext itself and the code generated by Xtext can be customized via dependency injection \cite{prasanna2009}. For the most worrying, the standard behavior of Xtext is generally good. For concerns that need customization (validation, linking/scope, among others), Xtext provides an easy-to-use API. Xtext strongly uses the EMF (Eclipse Modeling Framework) \cite{blewitt2013}. The AST created by the Xtext parser is an EMF model. The corresponding Ecore template can be automatically derived from grammar or explicitly specified. Thus, Xtext allows easy integration with Eclipse Modeling ecosystem tools, such as Model-to-Model or Model-to-Text transformation languages. Another example is to integrate Xtext with graphical tools such as the GMF (Graphical Modeling Framework) \cite{eysholdt2010}.
-
-% Neste trabalho foi usado o Xtext para implementação de uma DSL, visando a declaração de regras de distribuição de materiais para facilitar a criação de testes manuais e automáticos. 
-
-In this work Xtext was used to implement a DSL, aiming the declaration of material distribution rules to facilitate the creation of manual and automatic tests.
+In this work we used Xtext (a language workbench) to implement a DSL that help developers to specify and execute 
+test cases related to the process of QDM generation. The main rationale to building this DSL was the significant 
+costs related to specifying \callers (particularly during acceptance tests). 
 
