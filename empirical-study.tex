@@ -13,7 +13,7 @@ following research questions:
 
 \item \textbf{RQ.2}: Does the use of a DSL reduce the effort necessary to implement the test cases that target QDM generation? 
 
-\item \textbf{RQ.3}: Does our proposed approach, based on meta-programming, generate QDMs within a satisfatory time-frame?
+\item \textbf{RQ.3}: Does our proposed approach, based on meta-programming, generate QDMs within a satisfactory time-frame?
 
 \end{itemize}
 
@@ -24,6 +24,7 @@ to demonstrate that the solution automatically generates the rules, eliminating 
 would have to implement the solution in Java. With a few lines of code related to the definition of the template 
 and its execution, the solution generates a rule file with significant number of DRLs. The answer to this question 
 is related to the results of manual and automatic tests.
+
 \textbf{RQ.2} is related to the productivity of the tester and demonstrates how much code the 
 developer have to write when using our DSL, compared to the effort to specify \callers using the Java language in 
 unit test cases. Although there is no formal functional requirement specifying the  acceptable time for generating a QDM, 
@@ -36,20 +37,22 @@ Thus, \textbf{RQ.3} serves to ensure that the QDMs are generated in a satisfacto
 \subsection{Data Collection and Analysis}
 
 % A coleta dos dados foi realizada utilizando as seguintes métricas: linhas de código (LOC) e tempo de execução. A escolha dessas duas métricas está relacionada ao tamanho do código, que pode indicar uma maior produtividade; e à satisfação do requisito funcional que determina o tempo máximo de execução para a geração de QDM. 
-We answer our first querstion qualitatively. Although this might look like disappointing (under the 
+We answer our first question qualitatively. Although this might look like disappointing (under the 
 perspective of empirical methods), we have strong evidences collected from the domain experts 
 that our approach has produced correct QDMs. We believe that this correctness is due to several 
 factors, including the involvement of the domain experts that helped us to full understand 
 the requirements and the expertise of our development team. Nevertheless, the decision of 
 not writing the low-level rules at the source code level, but instead using a program 
 generation approach that has reduced significantly the effort needed to \emph{hand write} 
-those rules, has also contributed to achieve this confidence about corretness. In a meeting 
-with the domain experts, one of the specialists said: ``I got surprised with the 
-correcteness of the solution. In the previous version of the system, we have to start several 
-interactions untill we got confident about the correct operation of the \callers''. The first 
-time that we generate QDMs, the process was validate. It is important to note that ``not all 
-are flowers'', and we broke the initial implementation after the introduction of a new, 
-at first not so related feature that, in the end, cut accross several classes of 
+those rules, has also contributed to achieve this confidence about correctness. 
+
+In a meeting 
+with the domain experts, one of the specialists said: "I got surprised with the 
+correctness of the solution. In the previous version of the system, we have to start several 
+interactions until we got confident about the correct operation of the \callers". The first 
+time that we generate QDMs, the process was validate. It is important to note that "not all 
+are flowers", and we broke the initial implementation after the introduction of a new, 
+at first not so related feature that, in the end, cut across several classes of 
 the system. We fixed the related issues recently.  
 
 To answer the other two research questions, we collected the following metrics: lines of code (LOC) and execution time. The choice of these 
@@ -157,7 +160,7 @@ the difference for the representation in DSL also increases.
 
 \begin{figure}[htb!] 
 \centering
-  \includegraphics[width=.45\textwidth]
+  \includegraphics[width=.48\textwidth]
   {img/artigo_correlacao.jpg}
   \caption{\it Correlation between Java and Difference}
   \label{fig:correlacao}
@@ -167,7 +170,7 @@ Figure \ref{fig:geracao} the time necessary to generate QDMs for 5 different QCs
 6 QMS were generated, with different amounts of callers, 60, 100, 400, 700, 1000 and 2000.
 
 \begin{figure}[!ht] \centering
-  \includegraphics[width=.45\textwidth]
+  \includegraphics[width=.48\textwidth]
   {img/artigo_geracao.jpg}
   \caption{\it QDM Generation Time (ms)}
   \label{fig:geracao}
@@ -181,7 +184,7 @@ This indicates a possible productivity gain for the developer when writing test 
 since her will have to write a smaller amount of code. In addition, using our DSL we 
 specify \callers using a declarative approach, which is close to the vocabulary of 
 the problem domain. 
-With respepct to the third research question, the limit imposed by the functional requirement of 5 seconds was not exceeded,  
+With respect to the third research question, the limit imposed by the functional requirement of 5 seconds was not exceeded,  
 even when considering 2000 \callers, which is twice the number of \callers expected for the system 
 in production.
 
