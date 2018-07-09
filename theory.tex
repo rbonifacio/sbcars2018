@@ -1,4 +1,5 @@
-\section{Logistics Systems}\label{sec:logistics}
+\section{Logistics Systems}
+\label{sec:logistics}
 
 Logistics is the method used to implement military strategies and tactics as a method to gain 
 competitive advantage~\cite{rutner2012}. Logistics is defined as the art of moving armies, 
@@ -9,32 +10,32 @@ The logistics supplying function refers to the set of activities that deals with
 the material of different classes (including vehicles, armaments, munition, uniform, and fuel) necessary to the 
 military unities (including a rich organizational structure and a huge number of soldiers). 
 
-In order to facilitate the administration and control of materials and equipaments, the Brazilian Army uses a 
+In order to facilitate the administration and control of materials and equipments, the Brazilian Army uses a 
 catalog system that is similar to one defined by the North Atlantic Treaty Organization (OTAN)~\cite{otan2012}, 
-which classifies items into groups and classes. Instead, to support the provisioning of materials and equipaments, 
+which classifies items into groups and classes. Instead, to support the provisioning of materials and equipments, 
 the Brazilian Army catalog uses a classification that considers the \emph{type}, \emph{class}, and \emph{family} of the 
 materials, ignoring some details (such as specific brands and suppliers). More detailed information is considered by 
-other areas of the logistic system~\cite{brasil2003}. Several rules govern the identification of materials and equipaments, 
+other areas of the logistic system. Several rules govern the identification of materials and equipments, 
 to avoid duplication and simplify the process of decision making. A logistic system is the integrated set of organizations, 
 personnel, principles, and technical standards intended to provide the adequate flow for supplying materials~\cite{brasil2003}. 
 This is a complex system, and thus must be organized in different modules. 
 
 In this paper we present the main design and architectural decisions related to one of the modules (SISDOT) of the \emph{Integrated 
 Logistics System} (SIGELOG) of the Brazilian Army. SISDOT deals with the identification of the necessary 
-materials and equipaments (hereafter MEMs) for the organizational unities of the Brazilian Army. Each organizational 
+materials and equipments (hereafter MEMs) for the organizational unities of the Brazilian Army. Each organizational 
 unity is a combination of a set of \emph{generic organizations of specific types}, which describes the expected 
 number of military unities of an organization (including armies, divisions, brigades, and so on). The goal of 
 SISDOT is to estimate the set of MEMs that should be assigned to a generic organization, producing 
-one if its main products (named QDM). Based on a set of QDMs, SISDOT then derives another estimate 
+one of its main products (named QDM). Based on a set of QDMs, SISDOT then derives another estimate 
 of MEMs that should be assigned to a concrete organizational unity (a QDMP). 
 
 Before generating a QDM, it is necessary to catalog all relevant MEMs to a given 
 class of materials and then specify \callers (HLRs) that relate MEMs to the generic organizational 
 unities, considering different elements of the structure---from the type of the unity and 
-sub-unities to the qualifications of a soldier. {\color{red}That is, is is possible to elaborate a 
-\shc that states that a military ambulance would be assigned to all \emph{paratrooper and lightweight infantries}. 
+sub-unities to the qualifications of a soldier. That is, it is possible to elaborate a 
+\shc that states that a military ambulance would be assigned to all \emph{drivers within medical units}. 
 Differently, it is also possible to state that an automatic rifle will be assigned to all \emph{sergeant that has 
-been qualified as a shooter}.}. There is some degree of flexibility for writing these 
+been qualified as a shooter}. There is some degree of flexibility for writing these 
 rules, that might be from two different kinds: rules that consider the entire structure 
 of the Brazilian Army and rules that refer to specific elements of the organizational 
 structure. The former details rules that are more specific for a set of military qualifications. The second allows 
@@ -49,11 +50,11 @@ depending on the class of the materials. Moreover, it is possible to specify the
 to undesired results (e.g., the same material being assigned several times 
 to a given soldier). 
 
-Due to number of logic decisions, using an imperative language to implement the process of QDM generation 
+Due to number of logical decisions, using an imperative language to implement the process of QDM generation 
 is not an interesting choice. However, the SIGELOG architecture constraints the development 
 to use the Java Enterprise Edition platform---so we had little space to introduce a 
 more suitable language (such as Prolog) to generate QDMs. Other constraints guided 
-the architectural decisions of SISDOT:  
+the architectural decisions of SISDOT, including:  
 
 \begin{itemize}
 \item Maintenance: the set of languages and libraries are limited to those already used in the SIGELOG development.  
@@ -65,11 +66,13 @@ To deal with the first constraint, we decided to use a meta-programming approach
 \emph{low-level rules} for Drools (a rule based engine for Java) \emph{on the fly}, from a set of \callers represented 
 as domain objects that must exist in a database. In this way, it is not necessary to understand 
 the language used to specify rules in Drools. Surely, although this approach increases flexibility and  
-allowed us to externalize the \emph{low-level rules}, it might introduce some undesired effect on 
+allows us to externalize the \emph{low-level rules}, it might introduce some undesired effect on 
 the performance of the system: we generate all low-level rules every time a QDM is built. We are using 
 a cache mechanism and performance tests (as we discuss in Section~\ref{sec:case_study}) 
 shows that our architecture fulfills the second constraint. For the third constraint, we implemented a DSL that simplifies the specification and 
-execution of test cases. In Sections~\ref{sec:brs} and~\ref{sec:gp} 
+execution of test cases. 
+
+In the next sections (Section~\ref{sec:rbs} and Section~\ref{sec:architecture}) 
 we introduce some technical background that might help the reader to understand 
 the design and architectural decisions we take while implementing SISDOT.  
  
@@ -102,7 +105,8 @@ the design and architectural decisions we take while implementing SISDOT.
 
 %\section{Technical Background} 
 
-\section{Business Rules and Rule Based Engines}\label{sec:rbs}
+\section{Rule Based Systems}
+\label{sec:rbs}
 
 % Uma regra de negócio é uma declaração compacta, atômica e bem formada sobre um aspecto do negócio que pode ser expresso em termos que podem estar diretamente relacionados com o negócio e seus colaboradores, usando linguagem simples e não ambígua que é acessível a todas as partes interessadas: proprietário da empresa, analista de negócios, arquitetos, técnicos, cliente, dentre outros \cite{graham2007}. Esse tipo de estrutura é muito importante para as organizações, já que elas precisam lidar cada vez mais com  cenários complexos. Estes cenários são compostos por um grande número de decisões individuais, que trabalham em conjunto para fornecer uma avaliação complexa da organização como um todo \cite{salatino2016}.
 
@@ -110,37 +114,36 @@ The process for deriving QDMs consists of applying a set of business rules that
 relates MEMs to the organizational structure of the Brazilian Army. In this paper, we named 
 this set of business rules as \callers. A business rule is a compact, atomic, and well-formed 
 statement about an aspect of the business that can be expressed in terms that may be 
-directly related to the business and its employees using simple and unambiguous language 
-that is accessible to all stakeholders: business owner, business analyst, architects, technicians, client, 
-among others \cite{graham2007}. This type of structure is very important for organizations, 
+directly related to the business and its employees using a simple and unambiguous language 
+that might be accessible to all stakeholders~\cite{graham2007business}. This type of structure is very important for organizations, 
 as they need to deal more and more with complex scenarios. These scenarios consist of a 
 large number of individual decisions, working together to provide a 
-complex assessment of the organization as a whole \cite{salatino2016}.
+complex assessment of the organization as a whole \cite{salatino2016mastering}.
 
 % Sistemas baseados em regras (Rule Based Systems -- RBS), também conhecidos como production systems ou expert systems, são a forma mais simples de inteligência artificial, usando regras como representação do conhecimento \cite{grosan2011}. Ao invés de representar o conhecimento de forma declarativa e estática como um conjunto de coisas que são verdadeiras, RBS representa o conhecimento em termos de um conjunto de regras que diz o que fazer ou o que concluir em diferentes situações \cite{grosan2011}. Essas regras são também conhecidas como: condição-ação, produções, situação-ação ou se-então \cite{russell2010}.
 
 Rule Based Systems (RBS), also known as production systems or expert systems, are the 
 simplest form of artificial intelligence that help to design solutions that reason about 
-and take actions from business rules (a feature that is interesting in the context of SISDOT), using rules such as knowledge representation~\cite{grosan2011}. 
-Instead of representing knowledge in a declarative and static way as a set of things that are true, 
+and take actions from business rules (a feature that is interesting in the context of SISDOT), using rules such as knowledge representation~\cite{grosan2011}.Instead of representing knowledge in a declarative and static way as a set of things that are true, 
 RBS represents knowledge in terms of a set of rules that tells what to do or what to accomplish in different 
-situations~\cite{grosan2011}. These rules are also known as condition-action, productions, situation-action, 
-or if-then \cite{russell2010}.
-
-RBS consist of two basic elements: a \emph{knowledge base} to store knowledge and an \emph{inference engine} that 
-implements  algorithms to manipulate the knowledge represented in the knowledge base~\cite{grosan2011,lucas1991,gallacher1989}.
-The knowledge base stores facts and rules~\cite{hayesRoth1985}. Fact is an usually static statement about properties, relations, 
-or propositions~\cite{hayesRoth1985} and should be something relevant to the initial state of the system~\cite{grosan2011}. 
+situations~\cite{grosan2011}. 
+RBS consist of two basic elements: a \emph{knowledge base} to store knowledge and an \emph{inference engine} 
+that implements  algorithms to manipulate the knowledge represented in the 
+knowledge base~\cite{grosan2011,DBLP:books/daglib/0070547,gallacher1989}.
+The knowledge base stores facts and rules~\cite{DBLP:journals/cacm/Hayes-Roth85}. a fact is an usually static statement about properties, relations, 
+or propositions~\cite{DBLP:journals/cacm/Hayes-Roth85} and should be something relevant to the initial state of the system~\cite{grosan2011}. 
 A rule is a conditional statement that links certain conditions to actions or results \cite{abraham2005}, being able to express 
 policies, preferences, and constraints. Rules can be used to express deductive knowledge, 
-such as logical relationships, and thus support inference, verification, or evaluation tasks~\cite{hayesRoth1985}.
+such as logical relationships, and thus support inference, verification, or evaluation tasks~\cite{DBLP:journals/cacm/Hayes-Roth85}.
 
-A rule `if-then' takes a form like \emph{``if x is A then take a set of actions''}. 
+A rule ``if-then'' takes a form like \emph{``if x is A then take a set of actions''}. 
 The conditional part is known as antecedent, premise, condition, or left-hand-side (LHS). The other part 
 is known as consequent, conclusion, action, or right-hand-side (RHS)~\cite{grosan2011,abraham2005}. 
-Rules-based system works as follows~\cite{grosan2011}: it starts with a knowledge base, 
-which contains all appropriate knowledge coded using `if-then' rules, and a working memory, 
-which contain all data, assertions, and information initially known. The system examines all 
+Rule-based systems works as follows~\cite{grosan2011}: it starts with a knowledge base, 
+which contains all appropriate knowledge coded using ``if-then'' rules, and a working memory, 
+which contain all data, assertions, and information initially known. 
+
+The system examines all 
 rule conditions (LHS) and determines a subset of rules whose conditions are satisfied, based on the data 
 available at the working memory. From this information set, some of the rules are triggered. 
 The choice of rules is based on a conflict resolution strategy. When the rule is triggered, 
@@ -156,15 +159,17 @@ server). We use Drools as the \emph{rule-based system} in the QDM generation. Ho
 of a RBS, we generate the Drools rules using a meta-programming approach, a specific technique for 
 \emph{generative programming}. 
 
-\section{Generative Programming}\label{sec:gp}
+\section{Generative Programming}
+\label{sec:gp}
 
 Generative Programming (GP) is related to the design and implementation of 
 software components that can be combined to generate specialized and highly 
-optimized systems, fulfilling specific requirements~\cite{czarnecki1998}. 
+optimized systems, fulfilling specific requirements~\cite{DBLP:phd/dnb/Czarnecki99}. 
 With this approach, instead of developing solutions from scratch, domain-specific 
 solutions are generated from reusable software components \cite{arora2009}. 
 GP is applied on the manufacturing of software products from components in a system 
-in an automated way (and within economic constraints), i.e., how other industries have been 
+in an automated way (and within economic constraints), i.e., using an approach 
+that is similar to that found in industries that have been 
 producing mechanical, electronic, and other goods for decades \cite{barth2002}.
 The main idea in GP is similar to the one that led people to switch from Assembly 
 languages to high-level languages. 
@@ -198,8 +203,8 @@ in an effort to make web application development easier, improve flexibility,
 reduce maintenance costs, and enable parallel encoding and development in HTML language. 
 In addition to being widely used in dynamic web page generation, templates are used in other tasks, 
 being one of the main techniques to generate source code from high level specifications. More 
-recently, languages such as Clojure, Ruby, Scala and Haskell adopted the use of template and quasiquote 
-mechanisms as a reuse and program generation strategies (some of them considering type systems).
+recently, languages such as Clojure, Ruby, Scala and Haskell adopted the use of template and \emph{quasiquote} 
+mechanisms as a strategy for code reuse and program generation(some of them considering type systems).
 A template is a text document that 
 combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{segura2017}. 
 
@@ -209,7 +214,7 @@ such as: it follows a general purpose model; it is faster than other template en
 shared variables and model loaders; and its templates can be loaded or reloaded at runtime without the 
 need to (re)compile the application~\cite{benato2017,parr2006}.
 
-\subsection{Domain Specific Language}
+\subsection{Domain Specific Languages}
 
 A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010}. 
 Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specializing 

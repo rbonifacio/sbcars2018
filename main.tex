@@ -77,8 +77,9 @@
 
 
 \begin{document}
-%\title{Distribution of Military Employment Materials: A Case Study in the Brazilian Army}
-\title{On the Use of Meta-programming and Domain Specific Languages: An Experience Report in the Logistics Domain} 
+
+\title[On the Use of Metaprogramming and DSL: An Experience Report]{On the Use of Metaprogramming and Domain Specific Languages: An Experience Report in the Logistics Domain} 
+
 
 % \author{Pedro Henrique Teixeira Costa, Edna Dias Canedo and Rodrigo Bonif\'{a}acio de Almeida}
 % \email{pedro.costa@aluno.unb.br, ednacanedo@unb.br, rbonifacio@unb.br}
@@ -90,22 +91,26 @@
 %  \postcode{70910-900}
 % }
 
-\renewcommand{\shortauthors}{Costa et al.}
+\renewcommand{\shortauthors}{-}
 
 \newcommand{\callers}{\emph{high-level rules}\xspace}
 \newcommand{\shc}{HLR\xspace}
 
 \begin{abstract}
-
-% Distribuição de materiais é um tema comum na área de logística. A distribuição de Materiais de Emprego Militar (MEM) no Exército Brasileiro envolve a catalogação de materiais, a definição de regras que associam MEMs a unidades organizacionais, e a execução das regras para derivar os materiais previstos para cada unidade militar, listados no Quadro de Material Previsto (QDM). Atualmente, o QDM é gerado quase que totalmente de forma manual através do preenchimento de planilhas eletrônicas para cada Organização Militar (OM). O objetivo deste trabalho é apresentar a solução desenvolvida para geração automática de QDMs a partir da definição de regras de distribuição e posterior execução em um motor de regras. A simplicidade na definição das regras de distribuição de materiais, transformando definições de alto nível em definições baseadas em regras de motor de inferência, facilita a manutenção e extrai tais definições do código fonte de uma aplicação. Isso motivou o uso de programação generativa, em termos de meta-programação, e um motor de inferência específico para a linguagem Java. Embora seja específica para a 4ª Subchefia do Estado-Maior do Exército (EME), a solução tende a ser genérica o suficiente para ser adotada, após algumas adaptações, por outras áreas do exército ou até mesmo organizações externas que lidam com regras de distribuição de materiais semelhantes.
-
-In this paper we present the main design and architectural decisions to build an enterprise system that deals with the distribution of equipments to the Brazilian Army. The requirements of the system are far from trivial, and  
-we have to conciliate the need to extract business rules from the source code (increasing software flexibility) with the requirements of not exposing the use of a declarative languages to create an inference engine 
-and simplifying the tests of the application. Considering these goals, we present in this paper a seamless integration of meta-programming and domain-specific languages. The use of meta-programming allowed us to isolate and abstract all definitions necessary to externalize the business rules that ensures 
-the correct distribution of the equipments through the Brazilian Army departments. 
+In this paper we present the main design and architectural decisions to 
+build an enterprise system that deals with the distribution of equipments to the Brazilian Army. 
+The requirements of the system are far from trivial, and  
+we have to conciliate the need to extract business rules from the source code 
+(increasing software flexibility) with the requirements of not exposing the use of a declarative languages to use 
+a rule-based engine and simplifying the tests of the application. 
+Considering these goals, we present in this paper a seamless integration of meta-programming 
+and domain-specific languages. The use of meta-programming allowed us to isolate and abstract 
+all definitions necessary to externalize the business rules that ensures 
+the correct distribution of the equipments through the Brazilian Army unities. 
 The use of a domain specific language simplified the process of writing automatic 
-test cases related to our domain. Although our architecture target the specific needs of the Brazilian Army, we believe that logistic systems from other institutions might benefit from our decisions. 
-
+test cases related to our domain. Although our architecture target the specific needs 
+of the Brazilian Army, we believe that logistic systems from other institutions might also benefit 
+from our technical decisions. 
 \end{abstract}
 
 %
@@ -186,7 +191,6 @@ test cases related to our domain. Although our architecture target the specific 
 % \label{sec:Acknowledgments}
 
 % The authors would like to thank the Brazilian Army for their support to this work and to allow our University to conduct this research in the context of a real software modernization effort (FUB / CIC 6138/2016).
-
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{bibliography}

@@ -13,17 +13,16 @@ following research questions:
 
 \item \textbf{RQ.2}: Does the use of a DSL reduce the effort necessary to implement the test cases that target QDM generation? 
 
-\item \textbf{RQ.3}: Does our proposed approach, based on meta-programming, generate QDMs within a satisfatory time-frame?
+\item \textbf{RQ.3}: Does our proposed approach, based on meta-programming, generate QDMs within a satisfactory time-frame?
 
 \end{itemize}
 
 % A RQ.1 está relacionada à produtividade do testador e demonstra quanto código a menos o desenvolvedor deve implementar ao utilizar a DSL criada, em comparação com a declaração do mesmo chamador utilizando a linguagem Java. Apesar de não haver formalmente um requisito funcional especificando qual seria um tempo aceitável para a geração de um QDM, foi determinado que um tempo maior que 5 segundos, ao utilizar 1000 chamadores, é inaceitável. Assim, a RQ.2 serve para garantir que os QDMs sejam gerados em tempo satisfatório.
 
 \textbf{RQ.1} deals with the most important concern: correctness regarding the QDM generation. It is intended 
-to demonstrate that the solution automatically generates the rules, eliminating the work that the developer 
-would have to implement the solution in Java. With a few lines of code related to the definition of the template 
-and its execution, the solution generates a rule file with significant number of DRLs. The answer to this question 
-is related to the results of manual and automatic tests.
+to demonstrate that the solution not only automatically generates the rules, eliminating the work that the developer 
+would have to implement the solution in Java, but also that the proposed approach leads to the expected QDMs when considering 
+a well defined set of \callers.
 \textbf{RQ.2} is related to the productivity of the tester and demonstrates how much code the 
 developer have to write when using our DSL, compared to the effort to specify \callers using the Java language in 
 unit test cases. Although there is no formal functional requirement specifying the  acceptable time for generating a QDM, 
@@ -36,20 +35,22 @@ Thus, \textbf{RQ.3} serves to ensure that the QDMs are generated in a satisfacto
 \subsection{Data Collection and Analysis}
 
 % A coleta dos dados foi realizada utilizando as seguintes métricas: linhas de código (LOC) e tempo de execução. A escolha dessas duas métricas está relacionada ao tamanho do código, que pode indicar uma maior produtividade; e à satisfação do requisito funcional que determina o tempo máximo de execução para a geração de QDM. 
-We answer our first querstion qualitatively. Although this might look like disappointing (under the 
+We answer our first question qualitatively. Although this might look like disappointing (under the 
 perspective of empirical methods), we have strong evidences collected from the domain experts 
 that our approach has produced correct QDMs. We believe that this correctness is due to several 
 factors, including the involvement of the domain experts that helped us to full understand 
 the requirements and the expertise of our development team. Nevertheless, the decision of 
 not writing the low-level rules at the source code level, but instead using a program 
 generation approach that has reduced significantly the effort needed to \emph{hand write} 
-those rules, has also contributed to achieve this confidence about corretness. In a meeting 
+those rules, has also contributed to achieve this confidence about correctness. 
+
+In a meeting 
 with the domain experts, one of the specialists said: ``I got surprised with the 
-correcteness of the solution. In the previous version of the system, we have to start several 
-interactions untill we got confident about the correct operation of the \callers''. The first 
+correctness of the solution. In the previous version of the system, we had to have several 
+interactions until we got confident about the correct operation of the \callers''. The first 
 time that we generate QDMs, the process was validate. It is important to note that ``not all 
 are flowers'', and we broke the initial implementation after the introduction of a new, 
-at first not so related feature that, in the end, cut accross several classes of 
+at first not so related feature that, in the end, cut across several classes of 
 the system. We fixed the related issues recently.  
 
 To answer the other two research questions, we collected the following metrics: lines of code (LOC) and execution time. The choice of these 
@@ -60,7 +61,7 @@ functional requirement that determines the maximum execution time for the genera
 
 \begin{table}[htb!]
 \centering
-\caption{Comparing the number of lines of code between DSL and Java}
+\caption{Comparing the number of lines of code need to specify test cases using our DSL and Java}
 \label{table:comparacao}
 \begin{center}
 \begin{tabular}{ccc}
@@ -87,7 +88,7 @@ We use as a benchmark 66 \callers declared in its database. These \callers corre
 the Brazilian Army to perform some tests related to the generation of QDMs. We converted  
 each \shc written using JUnit to their correspondent one specified using our DSL. 
 Table \ref{table:comparacao} presents a sample of the collected data. The first column contains 
-the \shc code, the second column contains the number of lines of code to represent the \shc DSL, and the third 
+the \shc code, the second column contains the number of lines of code to represent the \shc using our DSL, and the third 
 column contains the number of lines to represent the same rule in the Java language.
 
 % Para a coleta da métrica de tempo de execução foi utilizado um computador com processador Intel(R) Core(TM) i7-4790, com 16GB de memória RAM, com o sistema operacional Ubuntu 16.04.4 LTS, 64 bits, com kernel 4.15.0-24-generic. Foram usados 16 QCs, escolhidos de forma a representar os variados tipos de OM, naturezas e subnaturezas. Para cada QC foram gerados QDMs usando as seguintes quantidades de chamadores: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000, 3000, 5000. Como só haviam 66 chamadores reais já declarados, os conjuntos com quantidade maior contém chamadores repetidos. A seleção dos chamadores foi realizada de maneira randômica, mas com o mesmo seed, para que os mesmos conjuntos fossem utilizados nas gerações dos QDMs de diferentes QCs. A Table \ref{table:tempo} apresenta uma amostra dos resultados obtidos com a execução. A primeira coluna contém o código do QC, e da segunda coluna em diante contém o tempo, em milisegundos, para a geração dos QDMs usando a quantidade de chamadores indicada no header da respectiva coluna.
@@ -96,7 +97,7 @@ Regarding the runtime metrics, we collected the data using an Intel(R) Core{TM} 
 with 16GB of RAM, running Ubuntu 16.04.4 LTS 64-bit operating system, with 4.15.0-24-generic kernel. We used 16 QCs, 
 chosen to represent the various OM types, natures, and subnatures. For each QC, we generated QDMs using 
 random sets of \callers with size: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000, 3000, 5000. 
-Since there were only 66 real \callers already declared, larger quantity contains repeated callers (which in the end will duplicate 
+Since there were only 66 real \callers already declared, larger quantities contain repeated callers (which in the end will duplicate 
 the data within a given QDM). The selection of callers was performed at random, but with the same seed, so that the same sets were used in the 
 generation of QDMs for different QCs. Table \ref{table:tempo} shows a sample of the results obtained with the execution. 
 The first column contains the QC code, and the second column contains the time in milliseconds for the generation of 
@@ -151,23 +152,23 @@ Difference & 2.00  & 7.00   & 12.09 & 13.94 & 83.00 \\ \hline
 
 Table \ref{table:analiseComparacao} presents some descriptive statistics 
 of the collected data, containing the following columns: minimum value, median, mean, standard deviation, and maximum value. 
-There is a strong correlation (0.982) between the lines of code in Java and the \emph{difference}. This correlation can be seen in 
-Figure \ref{fig:correlacao}. It is possible to identify that as the size of the Java code grows, 
+There is a strong correlation (0.982) between the lines of code in Java and the \emph{difference} measurements. 
+This correlation can be seen in Figure \ref{fig:correlacao}. It is possible to identify that as the size of the Java code grows, 
 the difference for the representation in DSL also increases.
 
 \begin{figure}[htb!] 
 \centering
-  \includegraphics[width=.45\textwidth]
+  \includegraphics[width=.48\textwidth]
   {img/artigo_correlacao.jpg}
   \caption{\it Correlation between Java and Difference}
   \label{fig:correlacao}
 \end{figure}
 
-Figure \ref{fig:geracao} the time necessary to generate QDMs for 5 different QCs. For each of them, 
-6 QMS were generated, with different amounts of callers, 60, 100, 400, 700, 1000 and 2000.
+Figure \ref{fig:geracao} shows the time necessary to generate QDMs for 5 different QCs. For each of them, 
+6 QMS were generated, with different amounts of \callers, 60, 100, 400, 700, 1000 and 2000.
 
 \begin{figure}[!ht] \centering
-  \includegraphics[width=.45\textwidth]
+  \includegraphics[width=.48\textwidth]
   {img/artigo_geracao.jpg}
   \caption{\it QDM Generation Time (ms)}
   \label{fig:geracao}
@@ -178,10 +179,10 @@ Figure \ref{fig:geracao} the time necessary to generate QDMs for 5 different QCs
 When analyzing the data related to RQ.2, it was possible to observe that the representation 
 of a \shc using our DSL is on average 45\% smaller than the representation of the same rule in Java. 
 This indicates a possible productivity gain for the developer when writing test cases, 
-since her will have to write a smaller amount of code. In addition, using our DSL we 
+since her will have to write a smaller amount of code. In addition, using our DSL, we 
 specify \callers using a declarative approach, which is close to the vocabulary of 
 the problem domain. 
-With respepct to the third research question, the limit imposed by the functional requirement of 5 seconds was not exceeded,  
+With respect to the third research question, the limit imposed by the functional requirement of 5 seconds was not exceeded,  
 even when considering 2000 \callers, which is twice the number of \callers expected for the system 
 in production.
 

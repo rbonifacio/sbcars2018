@@ -6,7 +6,7 @@ a typical Java enterprise application), where the components interact to each ot
 services from other components~\cite{clements2011documenting}. 
 SISDOT is also organized into logical groups of 
 components (known as tiers)---a strategy often used in the 
-client-server architectural styles. The multi-tier architectural pattern 
+client-server architectural style. The multi-tier architectural pattern 
 can be classified as a \emph{component and connector} pattern, 
 depending on the criterion used to define the tiers~\cite{bass2013software}. 
 Indeed, there are several criteria, such as component type, sharing of the execution environment, 
@@ -17,7 +17,7 @@ that govern how the components might interact with other components.
 Specifically, connectors might only exist 
 between components of the same tier or that reside in an adjacent 
 tier~\cite{clements2011documenting}. In addition, according to Bass et al., 
-the organization of a system using tiers supports software maintanance, facilitates the definition of 
+the organization of a system using tiers supports software maintenance, facilitates the definition of 
 security policies, and might increase the performance, availability, and modifiability of 
 the systems~\cite{bass2013software}. 
 
@@ -28,21 +28,23 @@ In order to further detail and illustrate the SISDOT architecture,
 and the main architectural decisions to address the constraints introduced 
 in Section~\ref{sec:logistics}, here we present a scenario that refers to the 
 generation of QDMs using a runtime architectural 
-description (see Figure~\ref{fig:runtime_qdm}). 
+description (see Figure~\ref{fig:fig:runtime_qdm}). 
 
-\begin{figure}
-\includegraphics[scale=0.5]{img/runtimeView_qdm.png}
+\begin{figure*}
+\includegraphics[scale=0.80]{img/runtimeView_qdm.png}
 \caption{Runtime view of the architecture} 
 \label{fig:fig:runtime_qdm}
-\end{figure}
+\end{figure*}
 
 \emph{Considering the user interaction}, a previously authenticated specialist on the 
-distribution of equipaments throughout the Brazilian Army, using her web browser, 
+distribution of equipments throughout the Brazilian Army, using her web browser, 
 requests the web page that allows the generation of QDMs (one of the main products of SISDOT). 
 After selecting the \emph{generic organizational unity} for which a QDM would be 
 generated, the system sends a request to the server. The client tier is responsible for these actions. 
 The request is then received by the SISDOT presentation tier, more specifically by a \emph{managed bean} that works 
-as a \emph{front controller} (in this case, a JSF controller). This controller validates  
+as a \emph{front controller} (in this case, a JSF controller). 
+
+This controller validates  
 the request data, before sending a new request to the business tier. In the business tier, the service 
 that implements the business rules related to the QDM domain object is invoked to start the QDM generation process, 
 which includes the transformation of \callers into the \emph{low-level rules} specified using the Drools Rule Language (DRL), 
@@ -52,10 +54,11 @@ object in the persistence layer (a relational database).
 The process of generating a QDM is started by retrieving a list of 
 previously registered \callers. An \shc, regardless of its type (either based on the 
 full structure of the organization or based on its components), 
-is related to one or more \emph{military materials / equipaments} (MEMs) 
+is related to one or more \emph{military materials / equipments} (MEMs) 
 and defines the respective amount that should be assigned to a military 
 unit (which ranges from an organization, a center, a department, a brigade, or even 
 a military function or qualification of a soldier). 
+
 A low-level rule has one or more distribution rules. Each rule has a type, 
 a value, and an associated description. For example, a rule for a 
 department type has the value of the department identifier and the description of 
@@ -68,11 +71,13 @@ exactly who should receive the MEMs specified by the \shc.
 % Um dos fatores que motivou o uso de um rule engine foi a similaridade entre chamadores e as regras 'se-então' características destes mecanismos. Um chamador possui um conjunto de condições que se encaixam na parte condicional de uma regra ('se') e possui uma série de ações ('então') que, no caso, são os MEMs que devem ser distribuídos em consequência da validade das condições. A estrutura básica de uma DRL pode ser vista na Listing \ref{code:drlStructure}.
 
 One of the factors that motivated the use of a rule based engine was 
-the similarity between \callers and the `if-then' rules of these mechanisms,  
+the similarity between \callers and the ``if-then'' rules of these mechanisms,  
 whose essential structure is shown in Listing~\ref{code:drlStructure}.
-An \shc has a set of conditions that fit the conditional part of a rule (`if') 
-and has a series of actions (`then') that, in this case, trigger the distribution 
-of MEMs throughout the expected military unities . 
+An \shc has a set of conditions that fit the conditional part of a rule (``if'') 
+and has a set of actions (``then'') that, in this case, trigger the distribution 
+of MEMs throughout the expected military unities.
+
+%\newpage
 
 \begin{lstlisting}[frame=single, caption={Structure of a rule specified in Drools}, label={code:drlStructure}]
 rule "name"
@@ -87,14 +92,14 @@ end
 
 The list of retrieved \callers contains only Java objects. 
 In order to be able to use the rule engine in a transparent way for the end users 
-(and also for developers in future maintanance scenarios), we decided to use a 
+(and also for developers in future maintenance scenarios), we decided to use a 
 meta-programming approach, translating these objects into a set of rules (i.e., a program in 
 logic programming) that might be used by a rule-based engine. As mentioned before,  
 we decided to use Drools to support a rule-based engine in the context of 
-SISDOT (Figure \ref{fig:runtime_qdm}), mostly because of its integration capabilities 
+SISDOT (Figure \ref{fig:fig:runtime_qdm}), mostly because of its integration capabilities 
 with both JEE systems and the Wildfly application server. Accordingly,  
 the \callers are translated into DRL rules. To this end, we use a template engine (Freemaker) 
-to implement this particular transformation (Figure \ref{fig:runtime_qdm}), using a template 
+to implement this particular transformation (Figure \ref{fig:fig:runtime_qdm}), using a template 
 that contains the required \emph{markups} for transforming \shc into \emph{low-level} Drools 
 rules. That is, for each \shc, the template engine populates the template, 
 resulting in a DRL rule consistent with the converted \shc.
@@ -102,7 +107,7 @@ resulting in a DRL rule consistent with the converted \shc.
 
 A QDM is generated for a generic organizational unity (hereafter QC, from \emph{Quadro de Cargos} in Portuguese), 
 selected by the user on the client tier. 
-Therefore, the user-specified QC must be retrieved from the Brazilian Army's enterprise database (EB) 
+Therefore, the user-specified QC must be retrieved from the Brazilian Army's enterprise database  
 through a specific Data Access Object (DAO) of the data tier~\cite{alur2003}.
 From the list of DRL rules, created based on existing \callers, the rule engine is instantiated and these rules are compiled, 
 so that they can be triggered by Drools. The recovered QC is inserted into the working memory as a fact,  an 
@@ -116,13 +121,13 @@ the selected QC.
 
 After the QDM generation, it is saved on the database and we let the domain expert know 
 of the success of the operation using a simple user interface message. 
-The domain expet can then perform the necessary operations on the generated QDM, including a workflow 
+The domain expert can then perform the necessary operations on the generated QDM, including a workflow 
 involving  its edition, homologation, and validation.  
 
 \subsection{A DSL for testing the generation of QDMs}
 
 As explained before, to generate a QDM, a set of \callers must be previously 
-declared. This is a time-consuming test, particularly when using the interface of 
+declared. This is a time-consuming task, particularly when using the interface of 
 the system. In order to facilitate the definition of the \callers used in the automated test scripts, we 
 decided to create a DSL (Domain Specific Language), enabling us to specify \callers in a 
 clear, objective, and declarative way. 
@@ -133,7 +138,7 @@ the materials (defined in the list of materials construct) for \emph{operational
 type construct) and militaries \emph{not working in the specified list of 
 departments} with a set of qualifications and roles. While the definition of this rule 
 using our DSL requires 12 lines of code, the corresponding definition of the same rule 
-using a Java test case requires 52 lines of imperative code.
+using a Java test case requires more than 50 lines of imperative code.
 
 \begin{small}
 \begin{lstlisting}[frame=single, caption={Example of a \shc declaration using our DSL}, label={code:dslExample}]
@@ -152,26 +157,31 @@ rule 1 {
 \end{lstlisting}
 \end{small}
 
-We implemented our DSL using Xtext~\cite{eysholdt2010}, which generates plugins that allow editing code in bothe Eclipse and IntelliJ. 
+We implemented our DSL using Xtext~\cite{eysholdt2010}, which generates plugins that allow editing code in both Eclipse and IntelliJ. 
 This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.
 A test activity consists first in the specification of the required \callers in a file. Next, the \emph{behavior under 
-test} is detailed as features using the Cucumber~\cite{wynne2017cucumber} framework. After that, the developer details 
-the implementation steps of the features by (a) specifying which \callers (previously declaredusing our DSL) should be considered 
+test} is detailed as features using the Cucumber~\cite{wynne2017cucumber} framework (we present an 
+example of a feature in Figure~\ref{fig:cucumber}). After that, the developer details 
+the implementation steps of the features by (a) specifying which \callers (previously declared using our DSL) should be considered 
 in the test execution, (b) specifying which QC the QDM should be generated, and (c) specifying the expected results in terms 
-of the properties of the expected QDM. The structure created supports several operations, with the intention 
+of the properties of the expected QDM. 
+
+The structure created supports several operations, with the intention 
 of increasing the productivity of the tester, such as: database connectivity, auxiliary methods for executing queries 
 in the database, and rules in the database rule engine. To facilitate the execution even in continuous integration 
 environments, we use a maven configuration file that declares the Xtext plugin, responsible for 
 generating the necessary code from the DSL, and a plugin for running unit tests (such as surefire).
 
 
-That is, our DSL simplifies the process of specifying \callers. Its primary goal was to 
+Altogether, our DSL simplifies the process of specifying \callers. Its primary goal was to 
 assist in test activities, though we presented some examples of \callers specified using 
 our DSL to domain experts, and they also considered this domain specific language relevant 
-to simulate the the specification of rules in order to better understand the effect of each 
-\shc for building QDMs. Now we are working on a custom user interface for SISDOT to allow 
-this specific feature. We are also working on the automatic generation of test cases 
-from ou DSL. This effort involves a custom Maven plugin that currently generates simple test cases, 
+to simulate the specification of rules in order to better understand the effect of each 
+\shc for building QDMs. Now we are working on a custom user interface for SISDOT to enable domain 
+expert to use this specific feature. 
+
+We are also working on the automatic generation of test cases 
+from our DSL. This effort involves a custom Maven plugin that currently generates simple test cases, 
 freeing the tester to create only complex tests related to the QDM generation. 
 These test cases are generated from a combination of conditions, for example: one test case only for operational OMs 
 and another for non-operational OMs; a test case for each OM nature, combining with the operational type, 
@@ -180,10 +190,17 @@ cases so that they are easy to verify without the need to build a Java solution 
 
 
 \begin{figure}[!ht] \centering
-  \includegraphics[width=.40\textwidth]
+  \includegraphics[width=.42\textwidth]
   {img/plugin.jpg}
   \caption{\it Maven plugin for test generation}
   \label{fig:pluginExample}
+\end{figure}
+
+\begin{figure}[!ht] \centering
+  \includegraphics[width=.45\textwidth]
+  {img/artigo_cucumber.jpg}
+  \caption{\it Cucumber feature}
+  \label{fig:cucumber}
 \end{figure}
 
 For each of the possible combinations, we generate a \shc that meets the conditions 
@@ -192,7 +209,7 @@ Each \shc is considered during the generation of the QDM to the QCs specified in
 maven plugin. That is, to use this architecture characteristic (here we consider testability as an 
 architecture concern), we ``feed'' the maven plugin with a list of QC codes for which the QDMs should be generated, 
 besides other optional information, which have default values, such as: connection string for the database, 
-seed to be used in the random selection of values within a combination (e.g., considering `20' natures of 
+seed to be used in the random selection of values within a combination (e.g., considering "20" natures of 
 organizational unities, randomly take 5 for generating the set of combinations), and the output directory 
 where the code should be exported. A basic example of the plugin declaration, omitting some details like 
 \texttt{groupId} and \texttt{artifactId}, can be seen in Figure ~\ref{fig:pluginExample}.

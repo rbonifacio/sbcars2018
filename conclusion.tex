@@ -1,25 +1,38 @@
-\section{Conclusion}
+\section{Final Remarks}
 \label{sec:conclusao}
 
 % O objetivo desse trabalho foi descrever as principais decisões arquiteturais e de design adotadas para implementar os mecanismos para derivar regras de negócio de alto nível em regras específicas para o motor de regras Drools e a definição de uma DSL que facilita a declaração de regras de negócio de alto nível. Além da apresentação do início do trabalho para geração automática de testes para complementar os testes definidos manualmente.
 
-The objective of this work was to describe the main architectural and design decisions adopted to implement the mechanisms to derive high level business rules in rules specific to the Drools rule engine and the definition of a DSL that facilitates the declaration of business rules of high level. In addition the presentation in the beginning of the work for automatic generation of tests to complement the manually defined tests.
+In this paper we detailed the main design and architectural decisions we use to 
+implement the mechanisms necessary to support the distribution of materials 
+through the Braziliar Army unities. These decisions included the use of 
+a metaprogamming approach to derive high level business rules in rules specific to a rule 
+based system (Drools) and the definition of a DSL that facilitates the declaration of \callers 
+to build test scripts. 
 
 % Foi realizado um estudo de caso para validar a arquitetura proposta a partir da avaliação do principal caso de uso do SISDOT, relacionado à geração de QDMs. A partir dos resultados obtidos com o estudo de caso foi possível observar uma diminuição considerável, de 45\% em média, da quantidade de linhas de código necessárias para a declaração de um chamador usando a DSL criada em comparação com a representação do mesmo chamador em Java, indicando um possível ganho de produtividade para o testador. Outro resultado do estudo de caso demonstrou a aderência do sistema ao requisito funcional declarado, de limitar o tempo de geração de um QDM em 5 segundos. Esse limite não foi ultrapassado nem quando foi utilizado o dobro da quantidade de chamadores esperados para o sistema em produção.
 
-A case study was carried out to validate the proposed architecture, based on the evaluation of the main use case of SISDOT, related to the generation of QDMs. From the results obtained, with the case study, it was possible to observe a considerable 45\% reduction in the average number of lines of code required for the declaration of a caller using the DSL, created in comparison with the representation of the same caller in Java, indicating a possible productivity gain for the tester. Another result of the case study demonstrated the adherence of the system to the stated functional requirement of limiting the generation time of a QDM in 5 seconds. This limit was not exceeded even when twice the number of callers expected for the system in production was used.
+We carried out an empirical study to validate the proposed architecture, based on the evaluation of one of the 
+main scenarios of our logistic system (SISDOT) , related to the generation of QDMs. From the results obtained, 
+it was possible to observe a reduction in the average number of lines of code required for the declaration 
+of a \callers using our DSL, inn comparison with the representation of the same \shc in Java. 
+Another result of the case study shows that our approach fulfills a non functional requirement that constraints 
+the expected time to generate QDMs. This limit was not exceeded even when using twice the number of \callers 
+expected for the system in production environment.
 
-Although the architecture target of this work concerning the specific needs of the Brazilian Army, it is believed that logistic systems from other institutions might benefit from our decisions.
+Although the architecture discussed here considers the specific needs of the Brazilian Army, 
+we believe that logistic systems from other institutions might benefit from our technical 
+decisions as well.
 
-% Para refinar os resultados obtidos com a arquitetura proposta foram definidos os os seguintes trabalhos futuros:
+%% % Para refinar os resultados obtidos com a arquitetura proposta foram definidos os os seguintes trabalhos futuros:
 
-To refine the results obtained with the proposed architecture, the following future works were defined:
+%% To refine the results obtained with the proposed architecture, the following future works were defined:
 
-\begin{itemize}
-% \item Refactoring dos serviços de QDM para otimizar a sua geração;
-\item Refactoring QDM services to optimize your generation;
-% \item Finalizar a geração de testes automáticos de forma a responder à RQ.3;
-\item Finish the generation of automatic tests in order to respond the RQ.3;
-% \item Coletar e analisar as métricas novamente quando houver uma quantidade expressiva de chamadores, os quais continuam em constante criação pelo Exército Brasileiro, com o intuito de testar a arquitetura proposta.
-\item Collect and analyze the metrics again when there is an expressive amount of callers, which are constantly being created by the Brazilian Army, in order to test the proposed architecture.
-\end{itemize}
+%% \begin{itemize}
+%% % \item Refactoring dos serviços de QDM para otimizar a sua geração;
+%% \item Refactoring QDM services to optimize your generation;
+%% % \item Finalizar a geração de testes automáticos de forma a responder à RQ.3;
+%% \item Finish the generation of automatic tests in order to respond the RQ.3;
+%% % \item Coletar e analisar as métricas novamente quando houver uma quantidade expressiva de chamadores, os quais continuam em constante criação pelo Exército Brasileiro, com o intuito de testar a arquitetura proposta.
+%% \item Collect and analyze the metrics again when there is an expressive amount of callers, which are constantly being created by the Brazilian Army, in order to test the proposed architecture.
+%% \end{itemize}
