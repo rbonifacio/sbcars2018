@@ -149,15 +149,15 @@ rule 1 {
    ("XXY" : "Rifle Carrying Case" : 2)
  ], 
  conditions = [ 
-  (cond=NEG, type=Department, values=[...]),
-  (type=Qualifications, values=[...]), 
+  (cond=NEG, type=DEPARTMENT, values=[...]),
+  (type=QUALIFICATION, values=[...]), 
   (type=ROLE, values=[...])
  ]
 }
 \end{lstlisting}
 \end{small}
 
-We implemented our DSL using Xtext~\cite{eysholdt2010}, which generates plugins that allow editing code in both Eclipse and IntelliJ. 
+We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ. 
 This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.
 A test activity consists first in the specification of the required \callers in a file. Next, the \emph{behavior under 
 test} is detailed as features using the Cucumber~\cite{wynne2017cucumber} framework (we present an 
@@ -210,7 +210,7 @@ maven plugin. That is, to use this architecture characteristic (here we consider
 architecture concern), we ``feed'' the maven plugin with a list of QC codes for which the QDMs should be generated, 
 besides other optional information, which have default values, such as: connection string for the database, 
 seed to be used in the random selection of values within a combination (e.g., considering "20" natures of 
-organizational unities, randomly take 5 for generating the set of combinations), and the output directory 
+organizational units, randomly take 5 for generating the set of combinations), and the output directory 
 where the code should be exported. A basic example of the plugin declaration, omitting some details like 
 \texttt{groupId} and \texttt{artifactId}, can be seen in Figure ~\ref{fig:pluginExample}.
 

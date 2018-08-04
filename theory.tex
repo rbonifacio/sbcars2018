@@ -22,7 +22,7 @@ This is a complex system, and thus must be organized in different modules.
 
 In this paper we present the main design and architectural decisions related to one of the modules (SISDOT) of the \emph{Integrated 
 Logistics System} (SIGELOG) of the Brazilian Army. SISDOT deals with the identification of the necessary 
-materials and equipments (hereafter MEMs) for the organizational unities of the Brazilian Army. Each organizational 
+materials and equipments (hereafter MEMs) for the organizational units of the Brazilian Army. Each organizational 
 unity is a combination of a set of \emph{generic organizations of specific types}, which describes the expected 
 number of military unities of an organization (including armies, divisions, brigades, and so on). The goal of 
 SISDOT is to estimate the set of MEMs that should be assigned to a generic organization, producing 
@@ -130,7 +130,7 @@ situations~\cite{grosan2011}.
 RBS consist of two basic elements: a \emph{knowledge base} to store knowledge and an \emph{inference engine} 
 that implements  algorithms to manipulate the knowledge represented in the 
 knowledge base~\cite{grosan2011,DBLP:books/daglib/0070547,gallacher1989}.
-The knowledge base stores facts and rules~\cite{DBLP:journals/cacm/Hayes-Roth85}. a fact is an usually static statement about properties, relations, 
+The knowledge base stores facts and rules~\cite{DBLP:journals/cacm/Hayes-Roth85}. a fact is a usually static statement about properties, relations, 
 or propositions~\cite{DBLP:journals/cacm/Hayes-Roth85} and should be something relevant to the initial state of the system~\cite{grosan2011}. 
 A rule is a conditional statement that links certain conditions to actions or results \cite{abraham2005}, being able to express 
 policies, preferences, and constraints. Rules can be used to express deductive knowledge, 
@@ -217,7 +217,7 @@ need to (re)compile the application~\cite{benato2017,parr2006}.
 \subsection{Domain Specific Languages}
 
 A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010}. 
-Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specializing 
+Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specialized 
 in languages~\cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts 
 appropriately to the phrases and input symbols it discovers.
 The need for new languages for many growing domains is increasing, as well as the emergence of more sophisticated 
@@ -234,7 +234,7 @@ potential to reduce the complexity of software development by increasing the lev
 According to the application domain, different notations (textual, graphical, tabular) are used \cite{pfeiffer2008}.
 
 
-In this work we used Xtext (a language workbench) to implement a DSL that help developers to specify and execute 
+In this work we used Xtext ~\cite{eysholdt2010} (a language workbench) to implement a DSL that help developers to specify and execute 
 test cases related to the process of QDM generation. The main rationale to building this DSL was the significant 
 costs related to specifying \callers (particularly during acceptance tests). 
 
