@@ -31,7 +31,7 @@ generation of QDMs using a runtime architectural
 description (see Figure~\ref{fig:fig:runtime_qdm}). 
 
 \begin{figure*}
-\includegraphics[scale=0.80]{img/runtimeView_qdm.png}
+\includegraphics[scale=0.70]{img/runtimeView_qdm.png}
 \caption{Runtime view of the architecture} 
 \label{fig:fig:runtime_qdm}
 \end{figure*}
@@ -71,23 +71,23 @@ exactly who should receive the MEMs specified by the \shc.
 % Um dos fatores que motivou o uso de um rule engine foi a similaridade entre chamadores e as regras 'se-então' características destes mecanismos. Um chamador possui um conjunto de condições que se encaixam na parte condicional de uma regra ('se') e possui uma série de ações ('então') que, no caso, são os MEMs que devem ser distribuídos em consequência da validade das condições. A estrutura básica de uma DRL pode ser vista na Listing \ref{code:drlStructure}.
 
 One of the factors that motivated the use of a rule based engine was 
-the similarity between \callers and the ``if-then'' rules of these mechanisms,  
-whose essential structure is shown in Listing~\ref{code:drlStructure}.
+the similarity between \callers and the ``if-then'' rules of these mechanisms.  
+%whose essential structure is shown in Listing~\ref{code:drlStructure}.
 An \shc has a set of conditions that fit the conditional part of a rule (``if'') 
 and has a set of actions (``then'') that, in this case, trigger the distribution 
 of MEMs throughout the expected military unities.
 
 %\newpage
 
-\begin{lstlisting}[frame=single, caption={Structure of a rule specified in Drools}, label={code:drlStructure}]
-rule "name"
-    attributes
-    when
-        LHS
-    then
-        RHS
-end
-\end{lstlisting}
+%\begin{lstlisting}[frame=single, caption={Structure of a rule specified in Drools}, label={code:drlStructure}]
+%rule "name"
+%    attributes
+%    when
+%        LHS
+%    then
+%        RHS
+%end
+%\end{lstlisting}
 
 
 The list of retrieved \callers contains only Java objects. 
@@ -138,7 +138,7 @@ the materials (defined in the list of materials construct) for \emph{operational
 type construct) and militaries \emph{not working in the specified list of 
 departments} with a set of qualifications and roles. While the definition of this rule 
 using our DSL requires 12 lines of code, the corresponding definition of the same rule 
-using a Java test case requires more than 50 lines of imperative code.
+using a Java test case requires more than 50 lines of imperative code. {\color{red}A gramatica que define a DSL pode ser vista na} Figure~\ref{fig:gramatica}
 
 \begin{small}
 \begin{lstlisting}[frame=single, caption={Example of a \shc declaration using our DSL}, label={code:dslExample}]
@@ -156,6 +156,12 @@ rule 1 {
 }
 \end{lstlisting}
 \end{small}
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
+	\caption{\it Xtext grammar defining the DSL structure} 
+	\label{fig:gramatica}
+\end{figure}
 
 We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ. 
 This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.
@@ -180,6 +186,22 @@ to simulate the specification of rules in order to better understand the effect 
 \shc for building QDMs. Now we are working on a custom user interface for SISDOT to enable domain 
 expert to use this specific feature. 
 
+
+{\color{red}Uma versão simplificada do template usado para geração de DRL pode ser visto na} Figure~\ref{fig:template}. {\color{red}A DRL gerada para o chamador da Listing 1 pode ser vista na} Figure~\ref{fig:drl}.
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=.47\textwidth]{img/artigo_template.jpg}
+	\caption{\it Freemarker template for generating DRL} 
+	\label{fig:template}
+\end{figure}
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=.47\textwidth]{img/artigo_drl.jpg}
+	\caption{\it DRL generated} 
+	\label{fig:drl}
+\end{figure}
+
+
 We are also working on the automatic generation of test cases 
 from our DSL. This effort involves a custom Maven plugin that currently generates simple test cases, 
 freeing the tester to create only complex tests related to the QDM generation. 
@@ -190,7 +212,7 @@ cases so that they are easy to verify without the need to build a Java solution 
 
 
 \begin{figure}[!ht] \centering
-  \includegraphics[width=.42\textwidth]
+  \includegraphics[width=.32\textwidth]
   {img/plugin.jpg}
   \caption{\it Maven plugin for test generation}
   \label{fig:pluginExample}
