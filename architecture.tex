@@ -30,11 +30,13 @@ in Section~\ref{sec:logistics}, here we present a scenario that refers to the
 generation of QDMs using a runtime architectural 
 description (see Figure~\ref{fig:fig:runtime_qdm}). 
 
-\begin{figure*}
-\includegraphics[scale=0.70]{img/runtimeView_qdm.png}
+%\begin{figure*}
+\begin{figure}[!ht] \centering
+\includegraphics[scale=0.55]{img/runtimeView_qdm.png}
 \caption{Runtime view of the architecture} 
 \label{fig:fig:runtime_qdm}
-\end{figure*}
+\end{figure}
+%\end{figure*}
 
 \emph{Considering the user interaction}, a previously authenticated specialist on the 
 distribution of equipments throughout the Brazilian Army, using her web browser, 
@@ -103,6 +105,13 @@ to implement this particular transformation (Figure \ref{fig:fig:runtime_qdm}), 
 that contains the required \emph{markups} for transforming \shc into \emph{low-level} Drools 
 rules. That is, for each \shc, the template engine populates the template, 
 resulting in a DRL rule consistent with the converted \shc.
+{\color{red}A simplified version of the template used for DRL generation can be seen in} Figure~\ref{fig:template}.
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=.48\textwidth]{img/artigo_template.jpg}
+	\caption{\it Freemarker template for generating DRL} 
+	\label{fig:template}
+\end{figure}
 
 
 A QDM is generated for a generic organizational unity (hereafter QC, from \emph{Quadro de Cargos} in Portuguese), 
@@ -132,16 +141,24 @@ the system. In order to facilitate the definition of the \callers used in the au
 decided to create a DSL (Domain Specific Language), enabling us to specify \callers in a 
 clear, objective, and declarative way. 
 
+We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ{, \color{red}plus an editor that can be embedded in a web application}. This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.{\color{red} To implement a DSL with Xtext it is necessary to declare a grammar similar to ANTLR \cite{parr2013}, and can be seen in} Figure~\ref{fig:gramatica}. {\color{red} From the specified grammar Xtext will generate the lexer, the parser, the AST (Abstract Syntax Tree) model, the construction of the AST to represent the parsed program, and the editor with all the IDE features. Xtext comes with good and smart default implementations for all these aspects. However, every single aspect can be customized by the language designer. \cite{bettini2016}.}
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
+	\caption{\it Xtext grammar defining the DSL structure} 
+	\label{fig:gramatica}
+\end{figure}
+
 Listing \ref{code:dslExample} presents a simple example of a \shc declaration using our DSL. 
 The goal of this rule is to distribute 
 the materials (defined in the list of materials construct) for \emph{operational} OMs (see the 
 type construct) and militaries \emph{not working in the specified list of 
 departments} with a set of qualifications and roles. While the definition of this rule 
 using our DSL requires 12 lines of code, the corresponding definition of the same rule 
-using a Java test case requires more than 50 lines of imperative code. {\color{red}A gramatica que define a DSL pode ser vista na} Figure~\ref{fig:gramatica}
+using a Java test case requires more than 50 lines of imperative code.
 
 \begin{small}
-\begin{lstlisting}[frame=single, caption={Example of a \shc declaration using our DSL}, label={code:dslExample}]
+\begin{lstlisting}[frame=single, caption={\it Example of a \shc declaration using our DSL}, label={code:dslExample}]
 rule 1 { 
  type = OPERATIONAL, 
  materials = [ 
@@ -157,14 +174,7 @@ rule 1 {
 \end{lstlisting}
 \end{small}
 
-\begin{figure}[!ht] \centering
-	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
-	\caption{\it Xtext grammar defining the DSL structure} 
-	\label{fig:gramatica}
-\end{figure}
 
-We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ. 
-This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.
 A test activity consists first in the specification of the required \callers in a file. Next, the \emph{behavior under 
 test} is detailed as features using the Cucumber~\cite{wynne2017cucumber} framework (we present an 
 example of a feature in Figure~\ref{fig:cucumber}). After that, the developer details 
@@ -174,7 +184,7 @@ of the properties of the expected QDM.
 
 The structure created supports several operations, with the intention 
 of increasing the productivity of the tester, such as: database connectivity, auxiliary methods for executing queries 
-in the database, and rules in the database rule engine. To facilitate the execution even in continuous integration 
+in the database, and rules in the rule engine. To facilitate the execution even in continuous integration 
 environments, we use a maven configuration file that declares the Xtext plugin, responsible for 
 generating the necessary code from the DSL, and a plugin for running unit tests (such as surefire).
 
@@ -187,16 +197,10 @@ to simulate the specification of rules in order to better understand the effect 
 expert to use this specific feature. 
 
 
-{\color{red}Uma versão simplificada do template usado para geração de DRL pode ser visto na} Figure~\ref{fig:template}. {\color{red}A DRL gerada para o chamador da Listing 1 pode ser vista na} Figure~\ref{fig:drl}.
+ {\color{red}A DRL gerada para o chamador da Listing 1 pode ser vista na} Figure~\ref{fig:drl}.  {\color{red} Na parte RHS da regra, há uma iteração sobre todos os cargos selecionados. Para cada cargo uma classe que auxilia o preenchimento do QDM é chamada para que os itens declarados no chamador, passado como parâmetro, sejam disponibilizados para o cargo. Essa classe auxiliar recupera o chamador passado como parâmetro a partir da lista de chamadores declarados na DSL, que foram convertidos em objetos Java. Além de auxiliar no preenchimento do QDM, esta classe popula alguns objetos que facilitam a verificação da consistência do QDM, por exemplo.}
 
 \begin{figure}[!ht] \centering
-	\includegraphics[width=.47\textwidth]{img/artigo_template.jpg}
-	\caption{\it Freemarker template for generating DRL} 
-	\label{fig:template}
-\end{figure}
-
-\begin{figure}[!ht] \centering
-	\includegraphics[width=.47\textwidth]{img/artigo_drl.jpg}
+	\includegraphics[width=.48\textwidth]{img/artigo_drl.jpg}
 	\caption{\it DRL generated} 
 	\label{fig:drl}
 \end{figure}
