@@ -37,8 +37,38 @@
   %showtabs=false,                  % show tabs within strings adding particular underscores
   %stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
   %stringstyle=\color{mymauve},     % string literal style
-  %tabsize=2,	                   % sets default tabsize to 2 spaces
+  tabsize=2,	                   % sets default tabsize to 2 spaces
   %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\lstdefinelanguage{Xtext}{
+	morekeywords={grammar, with, hidden, generate, as, import, returns, current, terminal, enum},
+	keywordstyle=[2]{\textbf},
+	morecomment=[l]{//}, 
+	morecomment=[s]{/*}{*/}, 
+	morestring=[b]",
+	tabsize=3
+}
+\newcommand{\lstXtext}[1]{\lstinline[breaklines=true,language=Xtext,basicstyle=\listingsfontinline,mathescape,literate={\-}{}{0\discretionary{-}{}{}}]\S#1\S}
+
+
+\lstdefinelanguage{DRL}{
+	morekeywords={rule, when, from, accumulate, and, in, then, for, int, end},
+	keywordstyle=[2]{\textbf},
+	morecomment=[l]{//}, 
+	morecomment=[s]{/*}{*/}, 
+	morestring=[b]",
+	tabsize=2
+}
+
+\lstdefinelanguage{Freemarker}{
+	morekeywords={if, assign, else},
+	keywordstyle=[2]{\textbf},
+	morecomment=[l]{//}, 
+	morecomment=[s]{/*}{*/}, 
+	morestring=[b]",
+	showspaces=false,
+	tabsize=2
 }
 
 %TODO: remover esses pacotes qdo traduzir para ingles

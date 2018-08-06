@@ -105,13 +105,13 @@ to implement this particular transformation (Figure \ref{fig:fig:runtime_qdm}), 
 that contains the required \emph{markups} for transforming \shc into \emph{low-level} Drools 
 rules. That is, for each \shc, the template engine populates the template, 
 resulting in a DRL rule consistent with the converted \shc.
-{\color{red}A simplified version of the template used for DRL generation can be seen in} Figure~\ref{fig:template}.
+{\color{red}A simplified version of the template used for DRL generation can be seen in} Listing \ref{code:template}.
 
-\begin{figure}[!ht] \centering
-	\includegraphics[width=.48\textwidth]{img/artigo_template.jpg}
-	\caption{\it Freemarker template for generating DRL} 
-	\label{fig:template}
-\end{figure}
+%\begin{figure}[!ht] \centering
+%	\includegraphics[width=.48\textwidth]{img/artigo_template.jpg}
+%	\caption{\it Freemarker template for generating DRL} 
+%	\label{fig:template}
+%\end{figure}
 
 
 A QDM is generated for a generic organizational unity (hereafter QC, from \emph{Quadro de Cargos} in Portuguese), 
@@ -127,6 +127,50 @@ the QDM is populated with the MEMs specified in the \emph{Right Hand Side} (RHS)
 complete QDM object after verifying all valid rules (previously registered in the database) for 
 the selected QC. 
 
+\begin{lstlisting}[frame=single, language=Freemarker, caption={\it Freemarker template for generating DRL}, label={code:template},basicstyle=\scriptsize]
+<#if rule.omType == "BOTH">
+<#assign operational="(operational==OPERATIONAL || operacional==NOT_OPERATIONAL)">
+<#else>
+<#assign operational="operational==${rule.omType}">
+</#if>
+rule "Chamador ${rule.codigo}"   	
+when
+$qc: QuadroDeCargosVO( 
+${operational} 				
+<#if map['NATURE']??> , ${map['NATURE']} </#if>
+<#if map['SUB_NATURE']??>
+<#if map['NATURE']??>||<#else>,</#if> ${map['SUB_NATURE']}
+</#if>
+<#if map['VALUE']?? > , ${map['VALUE']} </#if> 
+)	
+$roles: List( size > 0 ) from accumulate ( 
+$dep:DepartmentVO(<#if map['DEPARTMENT']??>${map['DEPARTMENT']}</#if>) from $qc.deps				  		   
+and
+$role: RoleVO(
+function == "ROLE"
+<#if map['ROLE_QC']?? > , ${map['ROLE_QC']} </#if>
+<#if map['ROLE']?? > , ${map['ROLE']} </#if>
+<#if map['SUB_CIRCLE']?? > , ${map['SUB_CIRCLE']} </#if> 
+<#if map['RANK']?? > , ${map['RANK']} </#if>	
+<#if map['ARMS']?? > , ${map['ARMS']} </#if>	 										
+) from $dep.roles <#if !map['QUALIFICATION']?? && !map['OBSERVATION']?? >;</#if>		
+<#if map['QUALIFICATION']?? >
+and QualificationVO(code ${map['QUALIFICATION']}) from $role.qualifications 
+<#if !map['OBSERVATION']?? >;</#if>	
+</#if>				
+<#if map['OBSERVATION']?? >
+and ObservationVO(code ${map['OBSERVATION']}) from $role.observations;	
+</#if>					
+collectList( $role )
+) 		
+then		 
+for(int i=0; i < $roles.size(); i++){       	
+RoleVO c = (RoleVO) $roles.get(i);
+helper.add(${rule.id?string.computer}L, c.getFractionId(), c.getRoleId());       
+}               
+end
+\end{lstlisting}
+
 
 After the QDM generation, it is saved on the database and we let the domain expert know 
 of the success of the operation using a simple user interface message. 
@@ -141,13 +185,50 @@ the system. In order to facilitate the definition of the \callers used in the au
 decided to create a DSL (Domain Specific Language), enabling us to specify \callers in a 
 clear, objective, and declarative way. 
 
-We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ{, \color{red}plus an editor that can be embedded in a web application}. This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.{\color{red} To implement a DSL with Xtext it is necessary to declare a grammar similar to ANTLR \cite{parr2013}, and can be seen in} Figure~\ref{fig:gramatica}. {\color{red} From the specified grammar Xtext will generate the lexer, the parser, the AST (Abstract Syntax Tree) model, the construction of the AST to represent the parsed program, and the editor with all the IDE features. Xtext comes with good and smart default implementations for all these aspects. However, every single aspect can be customized by the language designer. \cite{bettini2016}.}
+We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ{, \color{red}plus an editor that can be embedded in a web application}. This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.{\color{red} To implement a DSL with Xtext it is necessary to declare a grammar similar to ANTLR \cite{parr2013}, and can be seen in} Listing \ref{code:gramatica}. {\color{red} From the specified grammar Xtext will generate the lexer, the parser, the AST (Abstract Syntax Tree) model, the construction of the AST to represent the parsed program, and the editor with all the IDE features. Xtext comes with good and smart default implementations for all these aspects. However, every single aspect can be customized by the language designer. \cite{bettini2016}.}
 
-\begin{figure}[!ht] \centering
-	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
-	\caption{\it Xtext grammar defining the DSL structure} 
-	\label{fig:gramatica}
-\end{figure}
+%\begin{figure}[!ht] \centering
+%	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
+%	\caption{\it Xtext grammar defining the DSL structure} 
+%	\label{fig:gramatica}
+%\end{figure}
+\begin{lstlisting}[frame=single, language=Xtext, caption={\it Xtext grammar defining the DSL structure}, label={code:gramatica},basicstyle=\scriptsize]
+grammar br.unb.cic.sisdot.chamador.ChamadorDsl 
+with org.eclipse.xtext.common.Terminals
+
+generate chamadorDsl "http://www.unb.br/cic/sisdot/ChamadorDsl"
+
+Model:
+rules+=Rule*;
+
+Rule:
+'rule' code=INT '{'
+('type' '=' type=OmType ',')?
+'materials' '=' '[' items+=Item
+(',' items+=Item)*
+'],'
+'conditions' '=' '[' conditions+=Condition
+(',' conditions+=Condition)*
+']'
+'}';
+
+Item:
+'(' codot=STRING (':' name=STRING)? ':' amount=INT ')';
+
+Condition:
+'(' ('cond' '=' cond=ConditionType ',')?
+'type' '=' type=RuleType ','
+'values' '=' '[' values+=STRING (',' values+=STRING)* ']'
+')';
+
+enum OmType:
+BOTH | OPERATIONAL | NOT_OPERATIONAL;
+
+enum ConditionType:
+AFF | NEG;
+
+enum RuleType:
+NATURE | SUB_NATURE | VALUE | DEPARTMENT | ARMS | ROLE_QC | SUB_CIRCLE | RANK | ROLE | QUALIFICATION | OBSERVATION ;	\end{lstlisting}
 
 Listing \ref{code:dslExample} presents a simple example of a \shc declaration using our DSL. 
 The goal of this rule is to distribute 
@@ -197,13 +278,33 @@ to simulate the specification of rules in order to better understand the effect 
 expert to use this specific feature. 
 
 
- {\color{red}A DRL gerada para o chamador da Listing 1 pode ser vista na} Figure~\ref{fig:drl}.  {\color{red} Na parte RHS da regra, há uma iteração sobre todos os cargos selecionados. Para cada cargo uma classe que auxilia o preenchimento do QDM é chamada para que os itens declarados no chamador, passado como parâmetro, sejam disponibilizados para o cargo. Essa classe auxiliar recupera o chamador passado como parâmetro a partir da lista de chamadores declarados na DSL, que foram convertidos em objetos Java. Além de auxiliar no preenchimento do QDM, esta classe popula alguns objetos que facilitam a verificação da consistência do QDM, por exemplo.}
+ {\color{red}A DRL gerada para o chamador da Listing 1 pode ser vista na} Listing \ref{code:drl}.  {\color{red} Na parte RHS da regra, há uma iteração sobre todos os cargos selecionados. Para cada cargo uma classe que auxilia o preenchimento do QDM é chamada para que os itens declarados no chamador, passado como parâmetro, sejam disponibilizados para o cargo. Essa classe auxiliar recupera o chamador passado como parâmetro a partir da lista de chamadores declarados na DSL, que foram convertidos em objetos Java. Além de auxiliar no preenchimento do QDM, esta classe popula alguns objetos que facilitam a verificação da consistência do QDM, por exemplo.}
 
-\begin{figure}[!ht] \centering
-	\includegraphics[width=.48\textwidth]{img/artigo_drl.jpg}
-	\caption{\it DRL generated} 
-	\label{fig:drl}
-\end{figure}
+%\begin{figure}[!ht] \centering
+%	\includegraphics[width=.48\textwidth]{img/artigo_drl.jpg}
+%	\caption{\it DRL generated} 
+%	\label{fig:drl}
+%\end{figure}
+\begin{lstlisting}[frame=single, language=DRL, caption={\it DRL generated}, label={code:drl}, basicstyle=\scriptsize]
+rule "Chamador 1"   	
+when
+	$qc: QuadroDeCargosVO(operational == OPERATIONAL)	
+	$roles: List( size > 0 ) from accumulate ( 
+		$dep: DepartmentVO(depId not in (14086, 1130)) from $qc.deps				  		   
+		and
+		$role: RoleVO(
+			function == "ROLE"
+			, roleId in (2, 12, 15, 21)  
+		) from $dep.roles 		
+		and QualificationVO(code in ("782", "756")) from $role.qualifications;				
+		collectList( $role )
+	) 		
+then		 
+	for(int i=0; i < $roles.size(); i++){       	
+		RoleVO c = (RoleVO) $roles.get(i);
+		helper.add(1L, c.getFractionId(), c.getRoleId());   
+}               
+end	\end{lstlisting}
 
 
 We are also working on the automatic generation of test cases 
@@ -215,12 +316,33 @@ such as: infantry operational OMs and non-operational infantry OMs. These combin
 cases so that they are easy to verify without the need to build a Java solution for generating QDMs. 
 
 
-\begin{figure}[!ht] \centering
-  \includegraphics[width=.32\textwidth]
-  {img/plugin.jpg}
-  \caption{\it Maven plugin for test generation}
-  \label{fig:pluginExample}
-\end{figure}
+%\begin{figure}[!ht] \centering
+%  \includegraphics[width=.32\textwidth]
+%  {img/plugin.jpg}
+%  \caption{\it Maven plugin for test generation}
+%  \label{fig:pluginExample}
+%\end{figure}
+\begin{lstlisting}[frame=single, language=XML, caption={\it Maven plugin for test generation}, label={code:plugin},basicstyle=\scriptsize]
+<plugin>
+	<groupId>xxx</groupId>
+	<artifactId>xxx</artifactId>
+	<version>${project.version}</version>
+	<executions>
+		<execution>
+			<id>execute</id>			
+			<configuration>
+				<seed>10</seed>				
+				<listaQcsString>702311,762314,575311</listaQcsString>				
+			</configuration>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>	
+\end{lstlisting}
+
+
 
 \begin{figure}[!ht] \centering
   \includegraphics[width=.45\textwidth]
@@ -238,7 +360,7 @@ besides other optional information, which have default values, such as: connecti
 seed to be used in the random selection of values within a combination (e.g., considering "20" natures of 
 organizational units, randomly take 5 for generating the set of combinations), and the output directory 
 where the code should be exported. A basic example of the plugin declaration, omitting some details like 
-\texttt{groupId} and \texttt{artifactId}, can be seen in Figure ~\ref{fig:pluginExample}.
+\texttt{groupId} and \texttt{artifactId}, can be seen in Listing \ref{code:plugin}.
 
 After running the plugin, with the generated code, the tests are executed in a similar way to the test 
 definitions detailed before. The tests run along with the other unit tests declared, 
