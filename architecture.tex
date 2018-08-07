@@ -322,17 +322,16 @@ cases so that they are easy to verify without the need to build a Java solution 
 %  \caption{\it Maven plugin for test generation}
 %  \label{fig:pluginExample}
 %\end{figure}
-\begin{lstlisting}[frame=single, language=XML, caption={\it Maven plugin for test generation}, label={code:plugin},basicstyle=\scriptsize]
+\begin{lstlisting}[frame=single, language=Plugin, caption={\it Maven plugin for test generation}, label={code:plugin},basicstyle=\scriptsize]
 <plugin>
   <groupId>xxx</groupId>
   <artifactId>xxx</artifactId>
-  <version>${project.version}</version>
   <executions>
     <execution>
       <id>execute</id>			
       <configuration>
         <seed>10</seed>				
-        <listaQcsString>702311,762314,575311</listaQcsString>				
+        <qcs>702311,762314,575311</qcs>				
       </configuration>
       <goals>
         <goal>generate</goal>
