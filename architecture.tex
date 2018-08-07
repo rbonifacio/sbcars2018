@@ -239,7 +239,7 @@ using our DSL requires 12 lines of code, the corresponding definition of the sam
 using a Java test case requires more than 50 lines of imperative code.
 
 \begin{small}
-\begin{lstlisting}[frame=single, caption={\it Example of a \shc declaration using our DSL}, label={code:dslExample}]
+\begin{lstlisting}[frame=single, language=DSL, caption={\it Example of a \shc declaration using our DSL}, label={code:dslExample}]
 rule 1 { 
  type = OPERATIONAL, 
  materials = [ 
@@ -324,21 +324,21 @@ cases so that they are easy to verify without the need to build a Java solution 
 %\end{figure}
 \begin{lstlisting}[frame=single, language=XML, caption={\it Maven plugin for test generation}, label={code:plugin},basicstyle=\scriptsize]
 <plugin>
-	<groupId>xxx</groupId>
-	<artifactId>xxx</artifactId>
-	<version>${project.version}</version>
-	<executions>
-		<execution>
-			<id>execute</id>			
-			<configuration>
-				<seed>10</seed>				
-				<listaQcsString>702311,762314,575311</listaQcsString>				
-			</configuration>
-			<goals>
-				<goal>generate</goal>
-			</goals>
-		</execution>
-	</executions>
+  <groupId>xxx</groupId>
+  <artifactId>xxx</artifactId>
+  <version>${project.version}</version>
+  <executions>
+    <execution>
+      <id>execute</id>			
+      <configuration>
+        <seed>10</seed>				
+        <listaQcsString>702311,762314,575311</listaQcsString>				
+      </configuration>
+      <goals>
+        <goal>generate</goal>
+      </goals>
+    </execution>
+  </executions>
 </plugin>	
 \end{lstlisting}
 
