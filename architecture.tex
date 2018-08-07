@@ -258,7 +258,7 @@ rule 1 {
 
 A test activity consists first in the specification of the required \callers in a file. Next, the \emph{behavior under 
 test} is detailed as features using the Cucumber~\cite{wynne2017cucumber} framework (we present an 
-example of a feature in Figure~\ref{fig:cucumber}). After that, the developer details 
+example of a feature in Listing \ref{code:cucumber}). After that, the developer details 
 the implementation steps of the features by (a) specifying which \callers (previously declared using our DSL) should be considered 
 in the test execution, (b) specifying which QC the QDM should be generated, and (c) specifying the expected results in terms 
 of the properties of the expected QDM. 
@@ -344,12 +344,48 @@ cases so that they are easy to verify without the need to build a Java solution 
 
 
 
-\begin{figure}[!ht] \centering
-  \includegraphics[width=.45\textwidth]
-  {img/artigo_cucumber.jpg}
-  \caption{\it Cucumber feature}
-  \label{fig:cucumber}
-\end{figure}
+%\begin{figure}[!ht] \centering
+%  \includegraphics[width=.45\textwidth]
+%  {img/artigo_cucumber.jpg}
+%  \caption{\it Cucumber feature}
+%  \label{fig:cucumber}
+%\end{figure}
+\begin{lstlisting}[frame=single, language=Cucumber, caption={\it Cucumber feature}, label={code:cucumber},basicstyle=\scriptsize]
+Feature: QDM 757311
+	As a user
+	I want to generate a QDM from HLRs
+
+	Scenario: Test 1
+		Given QC with code 757311
+		And HRL: 1, 2
+		When I generate a QDM
+		And the results are consistent
+		Then positions must be populated
+		| idDep    | idPos   | codot      | amount |
+		| 6765748  | 10403   | 1051000025 | 1      |
+		| 6765748  | 10403   | 1020100017 | 1      |
+		| 6765748  | 10403   | 1020100013 | 1      |
+		| 6765748  | 10403   | 1051000006 | 1      |
+		| 6765748  | 21328   | 1051000025 | 1      |
+		| 6765750  | 10122   | 1051000025 | 1      |    
+		| 6765793  | 13276   | 1051000025 | 6      |
+		| 6765796  | 24655   | 1051000025 | 1      |
+		| 6765796  | 24429   | 1051000025 | 2      |
+		| 6765798  | 24429   | 1051000025 | 3      |
+		| 6765798  | 11433   | 1051000025 | 9      |   
+		And the final result must be:
+		| codot      | amount |
+		| 1020100013 | 74     |
+		| 1020100017 | 74     |
+		| 1051000006 | 74     |
+		| 1051000025 | 74     |
+
+	Scenario: Test 2
+		Given QC with code 757311
+		And HRL: 1, 2, 3
+		When I generate a QDM
+		And the results are inconsistent    
+\end{lstlisting}
 
 For each of the possible combinations, we generate a \shc that meets the conditions 
 and a cucumber feature that exercises the \shc and compares the expected results declared in the feature. 
