@@ -200,11 +200,11 @@ according to specific purposes~\cite{benato2017}.
 
 The need for dynamically generated web pages has led to the development of numerous template engines 
 in an effort to make web application development easier, improve flexibility, 
-reduce maintenance costs, and enable parallel encoding and development in HTML language. 
+reduce maintenance costs, and enable parallel encoding and development using HTML like languages. 
 In addition to being widely used in dynamic web page generation, templates are used in other tasks, 
 being one of the main techniques to generate source code from high level specifications. More 
-recently, languages such as Clojure, Ruby, Scala and Haskell adopted the use of template and \emph{quasiquote} 
-mechanisms as a strategy for code reuse and program generation(some of them considering type systems).
+recently, languages such as Clojure, Ruby, Scala, and Haskell adopted the use of template and \emph{quasiquote} 
+mechanisms as a strategy for code reuse and program generation (some of them considering type systems).
 A template is a text document that 
 combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{segura2017}. 
 
@@ -218,7 +218,7 @@ need to (re)compile the application~\cite{benato2017,parr2006}.
 
 A language is a set of valid sentences, serving as a mechanism for expressing intentions \cite{parr2010}. 
 Creating a new language is a time-consuming task, requires experience, and is usually performed by engineers specialized 
-in languages~\cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts 
+in languages construction~\cite{karsai2014}. To implement a language, one must construct an application that reads sentences and reacts 
 appropriately to the phrases and input symbols it discovers.
 The need for new languages for many growing domains is increasing, as well as the emergence of more sophisticated 
 tools that allow software engineers to define a new language with reasonable effort. As a result, a growing number of DSLs 
@@ -234,7 +234,10 @@ potential to reduce the complexity of software development by increasing the lev
 According to the application domain, different notations (textual, graphical, tabular) are used \cite{pfeiffer2008}.
 
 
-In this work we used Xtext ~\cite{eysholdt2010} (a language workbench) to implement a DSL that help developers to specify and execute 
-test cases related to the process of QDM generation. The main rationale to building this DSL was the significant 
-costs related to specifying \callers (particularly during acceptance tests). 
+In this work we used Xtext ~\cite{eysholdt2010} (a language workbench) to implement a DSL that helps
+developers to specify and execute test cases related to the process of QDM generation.
+The main rationale to building this DSL was the significant costs related to specifying \callers
+(particularly during acceptance tests). In the next section we present more details about
+our architectural decisions and implementation of our metaprogramming and DSL approach,
+which deals with the generation and test of QDMs. 
 
