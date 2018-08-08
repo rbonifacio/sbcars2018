@@ -1,0 +1,48 @@
+\appendix
+%Appendix A
+\section{Freemarker Template}
+\label{appendix:template} 
+
+\begin{lstlisting}[frame=single, language=Freemarker, caption={\it Freemarker template for generating DRL}, label={code:template},basicstyle=\scriptsize]
+<#if rule.omType == "BOTH">
+<#assign operational="(operational==OPERATIONAL || operacional==NOT_OPERATIONAL)">
+<#else>
+<#assign operational="operational==${rule.omType}">
+</#if>
+rule "Chamador ${rule.codigo}"   	
+when
+$qc: QuadroDeCargosVO( 
+${operational} 				
+<#if map['NATURE']??> , ${map['NATURE']} </#if>
+<#if map['SUB_NATURE']??>
+<#if map['NATURE']??>||<#else>,</#if> ${map['SUB_NATURE']}
+</#if>
+<#if map['VALUE']?? > , ${map['VALUE']} </#if> 
+)	
+$roles: List( size > 0 ) from accumulate ( 
+$dep:DepartmentVO(<#if map['DEPARTMENT']??>${map['DEPARTMENT']}</#if>) from $qc.deps				  		   
+and
+$role: RoleVO(
+function == "ROLE"
+<#if map['ROLE_QC']?? > , ${map['ROLE_QC']} </#if>
+<#if map['ROLE']?? > , ${map['ROLE']} </#if>
+<#if map['SUB_CIRCLE']?? > , ${map['SUB_CIRCLE']} </#if> 
+<#if map['RANK']?? > , ${map['RANK']} </#if>	
+<#if map['ARMS']?? > , ${map['ARMS']} </#if>	 										
+) from $dep.roles <#if !map['QUALIFICATION']?? && !map['OBSERVATION']?? >;</#if>		
+<#if map['QUALIFICATION']?? >
+and QualificationVO(code ${map['QUALIFICATION']}) from $role.qualifications 
+<#if !map['OBSERVATION']?? >;</#if>	
+</#if>				
+<#if map['OBSERVATION']?? >
+and ObservationVO(code ${map['OBSERVATION']}) from $role.observations;	
+</#if>					
+collectList( $role )
+) 		
+then		 
+for(int i=0; i < $roles.size(); i++){       	
+RoleVO c = (RoleVO) $roles.get(i);
+helper.add(${rule.id?string.computer}L, c.getFractionId(), c.getRoleId());       
+}               
+end
+\end{lstlisting}
