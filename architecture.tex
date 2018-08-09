@@ -159,43 +159,33 @@ tipically available in IDEs.
 %	\caption{\it Xtext grammar defining the DSL structure} 
 %	\label{fig:gramatica}
 %\end{figure}
-\begin{lstlisting}[frame=single, language=Xtext, caption={\it Xtext grammar defining the DSL structure}, label={code:gramatica},basicstyle=\scriptsize]
+\begin{lstlisting}[frame=single, language=Xtext, caption={\it Xtext grammar defining the DSL structure}, label={code:gramatica}]
 grammar br.unb.cic.sisdot.chamador.ChamadorDsl 
 with org.eclipse.xtext.common.Terminals
 
-generate chamadorDsl "http://www.unb.br/cic/sisdot/ChamadorDsl"
+generate chamadorDsl "http://www.unb.br/sisdot/ChamadorDsl"
 
 Model:
 rules+=Rule*;
 
 Rule:
-'rule' code=INT '{'
-('type' '=' type=OmType ',')?
-'materials' '=' '[' items+=Item
-(',' items+=Item)*
-'],'
-'conditions' '=' '[' conditions+=Condition
-(',' conditions+=Condition)*
-']'
+ 'rule' code=INT '{'
+  ('type' '=' type=OmType ',')?
+   'materials' '=' '['items+=Item (',' items+=Item)*'],'
+   'cnds' '=' '['cnds+=Condition (',' cnds+=Condition)*']'
 '}';
 
-Item:
-'(' codot=STRING (':' name=STRING)? ':' amount=INT ')';
+Item: '(' codot=STRING (':' name=STRING)? ':' amount=INT ')';
 
 Condition:
-'(' ('cond' '=' cond=ConditionType ',')?
-'type' '=' type=RuleType ','
-'values' '=' '[' values+=STRING (',' values+=STRING)* ']'
-')';
+ '(' ('cond' '=' cond=ConditionType ',')?
+ 'type' '=' type = RuleType ','
+ 'values' '=' '[' values+=STRING (',' values+=STRING)* ']'
+ ')';
 
-enum OmType:
-BOTH | OPERATIONAL | NOT_OPERATIONAL;
-
-enum ConditionType:
-AFF | NEG;
-
-enum RuleType:
-NATURE | SUB_NATURE | VALUE | DEPARTMENT | ARMS | ROLE_QC | SUB_CIRCLE | RANK | ROLE | QUALIFICATION | OBSERVATION ;
+enum OmType: BOTH | OPERATIONAL | NOT_OPERATIONAL;
+enum ConditionType: AFF | NEG;
+enum RuleType: NATURE | SUB_NATURE | VALUE | DEPARTMENT | ARMS | ROLE_QC | SUB_CIRCLE | RANK | ROLE | QUALIFICATION | OBSERVATION ;
 \end{lstlisting}
 
 Listing \ref{code:dslExample} presents a simple example of a \shc declaration using our DSL. 
@@ -214,7 +204,7 @@ rule 1 {
    ("XXX" : "Rifle" : 1), 
    ("XXY" : "Rifle Carrying Case" : 2)
  ], 
- conditions = [ 
+ cnds = [ 
   (cond=NEG, type=DEPARTMENT, values=[14086 , 1130]),
   (type=QUALIFICATION, values=[782, 756]), 
   (type=ROLE, values=[2, 12, 15, 21])
