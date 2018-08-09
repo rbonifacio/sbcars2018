@@ -141,7 +141,18 @@ the system. In order to facilitate the definition of the \callers used in the au
 decided to create a DSL (Domain Specific Language), enabling us to specify \callers in a 
 clear, objective, and declarative way. 
 
-We implemented our DSL using Xtext, which generates plugins that allow editing code in both Eclipse and IntelliJ{, \color{red}plus an editor that can be embedded in a web application}. This way, a developer writing test scripts use our DSL to take advantages of the functionality provided by these plugins.{\color{red} To implement a DSL with Xtext it is necessary to declare a grammar similar to ANTLR \cite{parr2013}, and can be seen in} Listing \ref{code:gramatica}. {\color{red} From the specified grammar Xtext will generate the lexer, the parser, the AST (Abstract Syntax Tree) model, the construction of the AST to represent the parsed program, and the editor with all the IDE features. Xtext comes with good and smart default implementations for all these aspects. However, every single aspect can be customized by the language designer. \cite{bettini2016}.}
+We implemented our DSL using Xtext, which generates plugins that allow
+code editing in both Eclipse and IntelliJ, plus an editor that can be
+embedded in a web application. This way, a developer writing test scripts might
+use our DSL to take advantages of the functionality provided by these plugins.
+To implement a DSL using Xtext, it is first necessary to declare a grammar expressed
+in a syntax similar to ANTLR~\cite{parr2013}. Listing~\ref{code:gramatica} presents
+the grammar of our DSL. From this grammar,the Xtext tool suite generates a lexer, a parser, a
+set of classes representing the AST (Abstract Syntax Tree), and an editor with several features
+tipically available in IDEs.
+% Although Xtext provides an interesting implementation for all
+% these concerns, a language designer is also able to customize several of the Xtext
+% outcomes~\cite{bettini2016}.
 
 %\begin{figure}[!ht] \centering
 %	\includegraphics[width=.47\textwidth]{img/artigo_gramatica.jpg}
@@ -184,7 +195,8 @@ enum ConditionType:
 AFF | NEG;
 
 enum RuleType:
-NATURE | SUB_NATURE | VALUE | DEPARTMENT | ARMS | ROLE_QC | SUB_CIRCLE | RANK | ROLE | QUALIFICATION | OBSERVATION ;	\end{lstlisting}
+NATURE | SUB_NATURE | VALUE | DEPARTMENT | ARMS | ROLE_QC | SUB_CIRCLE | RANK | ROLE | QUALIFICATION | OBSERVATION ;
+\end{lstlisting}
 
 Listing \ref{code:dslExample} presents a simple example of a \shc declaration using our DSL. 
 The goal of this rule is to distribute 
@@ -203,9 +215,9 @@ rule 1 {
    ("XXY" : "Rifle Carrying Case" : 2)
  ], 
  conditions = [ 
-  (cond=NEG, type=DEPARTMENT, values=[...]),
-  (type=QUALIFICATION, values=[...]), 
-  (type=ROLE, values=[...])
+  (cond=NEG, type=DEPARTMENT, values=[14086 , 1130]),
+  (type=QUALIFICATION, values=[782, 756]), 
+  (type=ROLE, values=[2, 12, 15, 21])
  ]
 }
 \end{lstlisting}
@@ -241,26 +253,21 @@ expert to use this specific feature.
 %	\caption{\it DRL generated} 
 %	\label{fig:drl}
 %\end{figure}
-\begin{lstlisting}[frame=single, language=DRL, caption={\it DRL generated}, label={code:drl}, basicstyle=\scriptsize]
+\begin{lstlisting}[frame=single, float=*, language=DRL, caption={\it DRL generated}, label={code:drl}]
 rule "Chamador 1"   	
 when
-	$qc: QuadroDeCargosVO(operational == OPERATIONAL)	
-	$roles: List( size > 0 ) from accumulate ( 
-		$dep: DepartmentVO(depId not in (14086, 1130)) from $qc.deps				  		   
-		and
-		$role: RoleVO(
-			function == "ROLE"
-			, roleId in (2, 12, 15, 21)  
-		) from $dep.roles 		
-		and QualificationVO(code in ("782", "756")) from $role.qualifications;				
-		collectList( $role )
-	) 		
+  $qc: QuadroDeCargosVO(operational == OPERATIONAL)	
+  $roles: List( size > 0 ) from accumulate ( 
+     $dep: DepartmentVO(depId not in (14086, 1130)) from $qc.deps and
+     $role: RoleVO(function == "ROLE", roleId in (2, 12, 15, 21)) from $dep.roles and  		
+     QualificationVO(code in ("782", "756")) from $role.qualifications;				
+    collectList( $role ))	 		
 then		 
 	for(int i=0; i < $roles.size(); i++){       	
 		RoleVO c = (RoleVO) $roles.get(i);
 		helper.add(1L, c.getFractionId(), c.getRoleId());   
-}               
-end	\end{lstlisting}
+end
+\end{lstlisting}
 
 
 We are also working on the automatic generation of test cases 
