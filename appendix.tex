@@ -1,9 +1,16 @@
-\appendix
-%Appendix A
-\section{Freemarker Template}
-\label{appendix:template} 
+\begin{appendix}
 
-\begin{lstlisting}[frame=single, language=Freemarker, caption={\it Freemarker template for generating DRL}, label={code:template},basicstyle=\scriptsize]
+% Appendix A
+\section*{APPENDIX}
+  
+\section*{A. FreeMarker Template}\label{appendix:template} 
+
+Listing~\ref{code:template} presents a code snippet of the
+FreeMarker template used to translate domain Java objects
+representing \callers into Drools rules, which will be interpreted
+for generating QDMs.
+
+\begin{lstlisting}[frame=single, language=Freemarker, caption={\it Freemarker template for generating Drools Rules (DRLs)}, label={code:template},basicstyle=\scriptsize]
 <#if rule.omType == "BOTH">
 <#assign operational="(operational==OPERATIONAL || operacional==NOT_OPERATIONAL)">
 <#else>
@@ -46,3 +53,5 @@ helper.add(${rule.id?string.computer}L, c.getFractionId(), c.getRoleId());
 }               
 end
 \end{lstlisting}
+
+\end{appendix}

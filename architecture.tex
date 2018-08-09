@@ -38,6 +38,22 @@ description (see Figure~\ref{fig:fig:runtime_qdm}).
 \end{figure}
 %\end{figure*}
 
+\begin{lstlisting}[frame=single, float=*, language=DRL, caption=Example of a \emph{low-level Drools rule}, label={code:drl}]
+rule "HLR 1"   	
+when
+  $qc: QuadroDeCargosVO(operational == OPERATIONAL)	
+  $roles: List( size > 0 ) from accumulate ( 
+     $dep: DepartmentVO(depId not in (14086, 1130)) from $qc.deps and
+     $role: RoleVO(function == "ROLE", roleId in (2, 12, 15, 21)) from $dep.roles and  		
+     QualificationVO(code in ("782", "756")) from $role.qualifications;				
+    collectList( $role ))	 		
+then		 
+	for(int i=0; i < $roles.size(); i++){       	
+		RoleVO c = (RoleVO) $roles.get(i);
+		helper.add(1L, c.getFractionId(), c.getRoleId());   
+end
+\end{lstlisting}
+
 \emph{Considering the user interaction}, a previously authenticated specialist on the 
 distribution of equipments throughout the Brazilian Army, using her web browser, 
 requests the web page that allows the generation of QDMs (one of the main products of SISDOT). 
@@ -60,6 +76,7 @@ is related to one or more \emph{military materials / equipments} (MEMs)
 and defines the respective amount that should be assigned to a military 
 unit (which ranges from an organization, a center, a department, a brigade, or even 
 a military function or qualification of a soldier). 
+
 
 A low-level rule has one or more distribution rules. Each rule has a type, 
 a value, and an associated description. For example, a rule for a 
@@ -95,17 +112,19 @@ of MEMs throughout the expected military unities.
 The list of retrieved \callers contains only Java objects. 
 In order to be able to use the rule engine in a transparent way for the end users 
 (and also for developers in future maintenance scenarios), we decided to use a 
-meta-programming approach, translating these objects into a set of rules (i.e., a program in 
+meta-programming approach, translating these objects into a set of rules (a program in 
 logic programming) that might be used by a rule-based engine. As mentioned before,  
 we decided to use Drools to support a rule-based engine in the context of 
 SISDOT (Figure \ref{fig:fig:runtime_qdm}), mostly because of its integration capabilities 
 with both JEE systems and the Wildfly application server. Accordingly,  
-the \callers are translated into DRL rules. To this end, we use a template engine (Freemaker) 
+the \callers are translated into DRL rules (Listing~\ref{code:drl} presents an
+example of a \emph{low-level Drools rule}). To this end, we use a template engine (Freemaker) 
 to implement this particular transformation (Figure \ref{fig:fig:runtime_qdm}), using a template 
 that contains the required \emph{markups} for transforming \shc into \emph{low-level} Drools 
 rules. That is, for each \shc, the template engine populates the template, 
 resulting in a DRL rule consistent with the converted \shc.
-{\color{red}A simplified version of the template used for DRL generation can be seen in} Listing \ref{code:template}.
+A code snippet of the template used for DRL generation can be seen in Appendice A. 
+
 
 %\begin{figure}[!ht] \centering
 %	\includegraphics[width=.48\textwidth]{img/artigo_template.jpg}
@@ -117,7 +136,7 @@ resulting in a DRL rule consistent with the converted \shc.
 A QDM is generated for a generic organizational unity (hereafter QC, from \emph{Quadro de Cargos} in Portuguese), 
 selected by the user on the client tier. 
 Therefore, the user-specified QC must be retrieved from the Brazilian Army's enterprise database  
-through a specific Data Access Object (DAO) of the data tier~\cite{alur2003}.
+through a specific Data Access Object (DAO) in the data tier~\cite{alur2003}.
 From the list of DRL rules, created based on existing \callers, the rule engine is instantiated and these rules are compiled, 
 so that they can be triggered by Drools. The recovered QC is inserted into the working memory as a fact,  an 
 information that is considered true. The rules are only executed when their conditions are satisfied, 
@@ -160,10 +179,10 @@ tipically available in IDEs.
 %	\label{fig:gramatica}
 %\end{figure}
 \begin{lstlisting}[frame=single, language=Xtext, caption={\it Xtext grammar defining the DSL structure}, label={code:gramatica}]
-grammar br.unb.cic.sisdot.chamador.ChamadorDsl 
+grammar br.unb.cic.sisdot.chamador.HLRDsl 
 with org.eclipse.xtext.common.Terminals
 
-generate chamadorDsl "http://www.unb.br/sisdot/ChamadorDsl"
+generate chamadorDsl "http://www.unb.br/sisdot/hlrdsl"
 
 Model:
 rules+=Rule*;
@@ -243,21 +262,6 @@ expert to use this specific feature.
 %	\caption{\it DRL generated} 
 %	\label{fig:drl}
 %\end{figure}
-\begin{lstlisting}[frame=single, float=*, language=DRL, caption={\it DRL generated}, label={code:drl}]
-rule "Chamador 1"   	
-when
-  $qc: QuadroDeCargosVO(operational == OPERATIONAL)	
-  $roles: List( size > 0 ) from accumulate ( 
-     $dep: DepartmentVO(depId not in (14086, 1130)) from $qc.deps and
-     $role: RoleVO(function == "ROLE", roleId in (2, 12, 15, 21)) from $dep.roles and  		
-     QualificationVO(code in ("782", "756")) from $role.qualifications;				
-    collectList( $role ))	 		
-then		 
-	for(int i=0; i < $roles.size(); i++){       	
-		RoleVO c = (RoleVO) $roles.get(i);
-		helper.add(1L, c.getFractionId(), c.getRoleId());   
-end
-\end{lstlisting}
 
 
 We are also working on the automatic generation of test cases 
