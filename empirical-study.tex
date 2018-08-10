@@ -1,9 +1,11 @@
-\section{Case Study}
+\section{Empirical Study}
 \label{sec:case_study} 
 
 
-For the validation of the proposed architecture we conducted a case study, which consists of the evaluation of the main 
-architectural decisions of SISDOT, which relate to the generation of QDMs. The case study aims to answer the 
+For the validation of the proposed architecture we conducted an empirical study,
+which consists of the evaluation of the main 
+architectural decisions of SISDOT, which relate to the generation of QDMs.
+The case study aims to answer the 
 following research questions:
 
 \begin{itemize}
@@ -25,14 +27,15 @@ would have to implement the solution in Java, but also that the proposed approac
 a well defined set of \callers.
 \textbf{RQ.2} is related to the productivity of the tester and demonstrates how much code the 
 developer have to write when using our DSL, compared to the effort to specify \callers using the Java language in 
-unit test cases. Although there is no formal functional requirement specifying the  acceptable time for generating a QDM, 
-it has been determined that a time greater than 5 seconds, when using 1000 \callers, would be unacceptable. 
+unit test cases. During the activities of requiements elicitation,
+we identified a softgoal stating the  acceptable time for generating a QDM, 
+which should not be above 5 seconds, when using 1000 \callers.
 Thus, \textbf{RQ.3} serves to ensure that the QDMs are generated in a satisfactory time.
 
 % Com a RQ.3 pretende-se demonstrar que a solução gera as regras automaticamente, eliminando o trabalho que o desenvolvedor teria para implementar a solução em Java. Com poucas linhas de código, relacionadas à definição do template e sua execução, a solução gera um arquivo de regras com determinado número de linhas de código Drools. A resposta dessa questão está relacionada aos resultados dos testes manuais e automáticos.
 
 
-\subsection{Data Collection and Analysis}
+\subsection{Data Collection and Analysis Procedures}
 
 % A coleta dos dados foi realizada utilizando as seguintes métricas: linhas de código (LOC) e tempo de execução. A escolha dessas duas métricas está relacionada ao tamanho do código, que pode indicar uma maior produtividade; e à satisfação do requisito funcional que determina o tempo máximo de execução para a geração de QDM. 
 We answer our first question qualitatively. Although this might look like disappointing (under the 
@@ -89,16 +92,16 @@ the Brazilian Army to perform some tests related to the generation of QDMs. We c
 each \shc written using JUnit to their correspondent one specified using our DSL. 
 Table \ref{table:comparacao} presents a sample of the collected data. The first column contains 
 the \shc code, the second column contains the number of lines of code to represent the \shc using our DSL, and the third 
-column contains the number of lines to represent the same rule in the Java language.
+column contains the number of lines of code to represent the same rule in the Java language.
 
 % Para a coleta da métrica de tempo de execução foi utilizado um computador com processador Intel(R) Core(TM) i7-4790, com 16GB de memória RAM, com o sistema operacional Ubuntu 16.04.4 LTS, 64 bits, com kernel 4.15.0-24-generic. Foram usados 16 QCs, escolhidos de forma a representar os variados tipos de OM, naturezas e subnaturezas. Para cada QC foram gerados QDMs usando as seguintes quantidades de chamadores: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000, 3000, 5000. Como só haviam 66 chamadores reais já declarados, os conjuntos com quantidade maior contém chamadores repetidos. A seleção dos chamadores foi realizada de maneira randômica, mas com o mesmo seed, para que os mesmos conjuntos fossem utilizados nas gerações dos QDMs de diferentes QCs. A Table \ref{table:tempo} apresenta uma amostra dos resultados obtidos com a execução. A primeira coluna contém o código do QC, e da segunda coluna em diante contém o tempo, em milisegundos, para a geração dos QDMs usando a quantidade de chamadores indicada no header da respectiva coluna.
 
 Regarding the runtime metrics, we collected the data using an Intel(R) Core{TM} i7-4790 processor, 
 with 16GB of RAM, running Ubuntu 16.04.4 LTS 64-bit operating system, with 4.15.0-24-generic kernel. We used 16 QCs, 
 chosen to represent the various OM types, natures, and subnatures. For each QC, we generated QDMs using 
-random sets of \callers with size: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000, 3000, 5000. 
-Since there were only 66 real \callers already declared, larger quantities contain repeated callers (which in the end will duplicate 
-the data within a given QDM). The selection of callers was performed at random, but with the same seed, so that the same sets were used in the 
+random sets of \callers with size: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000. 
+Since there were only 66 real \callers already declared, larger quantities contain repeated \callers (which in the end will duplicate 
+the data within a given QDM). The selection of \callers was performed at random, but with the same seed, so that the same sets were used in the 
 generation of QDMs for different QCs. Table \ref{table:tempo} shows a sample of the results obtained with the execution. 
 The first column contains the QC code, and the second column contains the time in milliseconds for the generation of 
 the QDMs using the indicated amount of \callers on the respective column header.
@@ -174,7 +177,7 @@ Figure \ref{fig:geracao} shows the time necessary to generate QDMs for 5 differe
   \label{fig:geracao}
 \end{figure}
 
-\subsection{Discussion}
+\subsection{Discussion and Threats to Validity}
 
 When analyzing the data related to RQ.2, it was possible to observe that the representation 
 of a \shc using our DSL is on average 45\% smaller than the representation of the same rule in Java. 
@@ -186,7 +189,7 @@ With respect to the third research question, the limit imposed by the functional
 even when considering 2000 \callers, which is twice the number of \callers expected for the system 
 in production.
 
-\subsection{Threats to validity}
+
 
 % Foram usados apenas 66 chamadores reais, que serviram de base para medir o tempo de geração de QDMs. Espera-se que o SISDOT tenha por volta de 1000 chamadores, quando o mesmo estiver em ambiente de produção. Apesar da pequena quantidade de chamadores utilizada, incluindo suas repetições quando necessário, é esperado que o sistema cumpra o requisito funcional, pois os testes com o dobro de chamadores esperados ainda estão dentro do tempo máximo aceitável de 5 segundos para geração de QDM.
 
