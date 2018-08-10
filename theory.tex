@@ -10,19 +10,19 @@ The logistics supplying function refers to the set of activities that deals with
 the material of different classes (including vehicles, armaments, munition, uniform, and fuel) necessary to the 
 military unities (including a rich organizational structure and a huge number of soldiers). 
 
-In order to facilitate the administration and control of materials and equipments, the Brazilian Army uses a 
+In order to facilitate the administration and control of materials and equipment, the Brazilian Army uses a 
 catalog system that is similar to one defined by the North Atlantic Treaty Organization (OTAN)~\cite{otan2012}, 
-which classifies items into groups and classes. Instead, to support the provisioning of materials and equipments, 
+which classifies items into groups and classes. Instead, to support the provisioning of materials and equipment, 
 the Brazilian Army catalog uses a classification that considers the \emph{type}, \emph{class}, and \emph{family} of the 
 materials, ignoring some details (such as specific brands and suppliers). More detailed information is considered by 
-other areas of the logistic system. Several rules govern the identification of materials and equipments, 
+other areas of the logistic system. Several rules govern the identification of materials and equipment, 
 to avoid duplication and simplify the process of decision making. A logistic system is the integrated set of organizations, 
 personnel, principles, and technical standards intended to provide the adequate flow for supplying materials~\cite{brasil2003}. 
 This is a complex system, and thus must be organized in different modules. 
 
 In this paper we present the main design and architectural decisions related to one of the modules (SISDOT) of the \emph{Integrated 
 Logistics System} (SIGELOG) of the Brazilian Army. SISDOT deals with the identification of the necessary 
-materials and equipments (hereafter MEMs) for the organizational units of the Brazilian Army. Each organizational 
+materials and equipment (hereafter MEMs) for the organizational units of the Brazilian Army. Each organizational 
 unity is a combination of a set of \emph{generic organizations of specific types}, which describes the expected 
 number of military unities of an organization (including armies, divisions, brigades, and so on). The goal of 
 SISDOT is to estimate the set of MEMs that should be assigned to a generic organization, producing 
@@ -72,7 +72,7 @@ a cache mechanism and performance tests (as we discuss in Section~\ref{sec:case_
 shows that our architecture fulfills the second constraint. For the third constraint, we implemented a DSL that simplifies the specification and 
 execution of test cases. 
 
-In the next sections (Section~\ref{sec:rbs} and Section~\ref{sec:architecture}) 
+In the next sections (Section~\ref{sec:rbs} and Section~\ref{sec:gp}) 
 we introduce some technical background that might help the reader to understand 
 the design and architectural decisions we take while implementing SISDOT.  
  
@@ -208,8 +208,8 @@ mechanisms as a strategy for code reuse and program generation (some of them con
 A template is a text document that 
 combines placeholders and linguistic formulas used to describe something in a specific domain~\cite{segura2017}. 
 
-In this work we use the Freemarker template engine, which is an open-source software designed to 
-generate text from templates~\cite{radjenovic2009}. Freemarker was chosen for several reasons, 
+In this work we use the FreeMarker template engine, which is an open-source software designed to 
+generate text from templates~\cite{radjenovic2009}. FreeMarker was chosen for several reasons, 
 such as: it follows a general purpose model; it is faster than other template engines; it supports 
 shared variables and model loaders; and its templates can be loaded or reloaded at runtime without the 
 need to (re)compile the application~\cite{benato2017,parr2006}.

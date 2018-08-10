@@ -12,7 +12,7 @@ for generating QDMs.
 
 \begin{lstlisting}[frame=single, language=Freemarker, caption={\it Freemarker template for generating Drools Rules (DRLs)}, label={code:template},basicstyle=\scriptsize]
 <#if rule.omType == "BOTH">
-<#assign operational="(operational==OPERATIONAL || operacional==NOT_OPERATIONAL)">
+<#assign operational="(operational==OPERATIONAL || operational==NOT_OPERATIONAL)">
 <#else>
 <#assign operational="operational==${rule.omType}">
 </#if>
