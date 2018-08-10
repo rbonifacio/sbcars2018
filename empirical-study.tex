@@ -27,7 +27,7 @@ would have to implement the solution in Java, but also that the proposed approac
 a well defined set of \callers.
 \textbf{RQ.2} is related to the productivity of the tester and demonstrates how much code the 
 developer have to write when using our DSL, compared to the effort to specify \callers using the Java language in 
-unit test cases. During the activities of requiements elicitation,
+unit test cases. During the activities of requirements elicitation,
 we identified a softgoal stating the  acceptable time for generating a QDM, 
 which should not be above 5 seconds, when using 1000 \callers.
 Thus, \textbf{RQ.3} serves to ensure that the QDMs are generated in a satisfactory time.
@@ -98,7 +98,7 @@ column contains the number of lines of code to represent the same rule in the Ja
 
 Regarding the runtime metrics, we collected the data using an Intel(R) Core{TM} i7-4790 processor, 
 with 16GB of RAM, running Ubuntu 16.04.4 LTS 64-bit operating system, with 4.15.0-24-generic kernel. We used 16 QCs, 
-chosen to represent the various OM types, natures, and subnatures. For each QC, we generated QDMs using 
+chosen to represent the various OM types, natures, and sub-natures. For each QC, we generated QDMs using 
 random sets of \callers with size: 20, 40, 50, 60, 100, 200, 400, 700, 1000, 1500, 2000. 
 Since there were only 66 real \callers already declared, larger quantities contain repeated \callers (which in the end will duplicate 
 the data within a given QDM). The selection of \callers was performed at random, but with the same seed, so that the same sets were used in the 
@@ -177,26 +177,73 @@ Figure \ref{fig:geracao} shows the time necessary to generate QDMs for 5 differe
   \label{fig:geracao}
 \end{figure}
 
-\subsection{Discussion and Threats to Validity}
+\subsection{Discussion, Lessons Learned, and Threats to Validity}
 
-When analyzing the data related to RQ.2, it was possible to observe that the representation 
+When analyzing the data related to RQ.2, it was possible to realize that the representation 
 of a \shc using our DSL is on average 45\% smaller than the representation of the same rule in Java. 
 This indicates a possible productivity gain for the developer when writing test cases, 
 since her will have to write a smaller amount of code. In addition, using our DSL, we 
 specify \callers using a declarative approach, which is close to the vocabulary of 
-the problem domain. 
-With respect to the third research question, the limit imposed by the functional requirement of 5 seconds was not exceeded,  
-even when considering 2000 \callers, which is twice the number of \callers expected for the system 
-in production.
+the problem domain. With respect to the third research question, the limit imposed by the
+functional requirement of 5 seconds was not exceeded, even when considering 2000 \callers,
+which is twice the number of \callers expected for the system in production. It is important
+to notice that these number (5 seconds as time limit and 1000 \callers were collected together
+with the stakeholders of SISDOT).
+
+The general approach discussed in this paper involves the use of metaprogramming
+to generate low-level Drools rules from \callers and the use of a DSL to specify
+\callers during test activities. We have some previous experience using Drools,
+and, at the beginning of this research collaboration, we realized that the use of
+a rule based engine (such as Drools), could simplify the computation of QDMs
+(one of the main products of SISDOT). Nevertheless, we should try to abstract
+the use of Drools, mostly due to architectural conformance---we should not
+introduce new languages during the development of SISDOT. For this reason, we applied a
+transformational approach, translating Java domain objects into
+Drools rules at runtime. Perhaps due to the structure of the \callers, the task of implementing
+this transformational approach was not difficult. We believe that it was the
+right decision considering the original set of requirements. Surely, a number of uncertainties arise,
+including: ``will our proposed approach support
+the expectations of the end-users w.r.t. correctness
+and time constraints?''. We address this question in our empirical evaluation.
+
+However, we found that testing the process of QDM generation was
+time consuming, and then we designed a DSL to address the main
+bottleneck: the specification of \callers either using Java test scripts
+or the SISDOT user interface (the common way for specifying \callers). Our choice
+for using Xtext to this end had simplified the entire process for
+implementing a DSL. Even considering that \hlrdsl is a simple and
+small DSL, we argue that the set of Xtext tools is really simple and productive,
+reducing the overall effort to implement the \hlrdsl grammar, parser, and
+program generator. We could have used other tools and techniques as well, for instance
+a metaprogramming approach to support our test activities. However,
+such approach would not have solved the main problem that motivated us
+to implement \hlrdsl. In this case, our goal was to design a simple
+approach for specifying \callers. In the end, \hlrdsl started to
+be considered an interesting approach for use not only in test
+activities, but also for simulating QDMs without the need
+to persist \callers in the production environment. 
 
 
 
 % Foram usados apenas 66 chamadores reais, que serviram de base para medir o tempo de geração de QDMs. Espera-se que o SISDOT tenha por volta de 1000 chamadores, quando o mesmo estiver em ambiente de produção. Apesar da pequena quantidade de chamadores utilizada, incluindo suas repetições quando necessário, é esperado que o sistema cumpra o requisito funcional, pois os testes com o dobro de chamadores esperados ainda estão dentro do tempo máximo aceitável de 5 segundos para geração de QDM.
 
-We only consider 66 real \callers in our study, which served as a basis for measuring the generation time 
-of QDMs. SISDOT is expected to have around 1000 \callers in the production environment. To mitigate the threat 
-related to the small number of available \callers for testing, we consider their repetition when carrying out the 
-performance test of the application. In this way, we expect that the system would present a behavior similar 
-to the production environment (with respect to performance). The same situation occurs with the comparison 
-of lines of code between the declarations of \callers in DSL and Java. As the number of callers is relatively small, 
+Our empirical study presents several limitations. First, we discuss
+\emph{correctness} based on the results of both integration and acceptance
+tests, though also considering the opinion of the domain experts that are
+currently confident that our approach for QDM generation is working
+properly. Surely, we could have used a more formal approach for
+discussing correctness, and we postpone this investigation to a future
+work. Nevertheless, considering the scope of this paper, the feedback
+from the domain experts and testing outcomes reduce some of ours
+uncertainties about correctness. 
+
+
+Second, we only considered 66 real \callers in our study, which served as a basis
+for measuring the time to generate QDMs. SISDOT is expected to have around 1000
+\callers in the production environment. To mitigate the threat 
+related to the small number of available \callers for testing, we considered their repetition
+when carrying out a performance test of SISDOT. In this way, we expect that the
+system would present a behavior similar to the production environment (with respect to performance).
+The same situation occurs with the comparison of lines of code between the declarations
+of \callers in DSL and Java. As the number of \callers is relatively small, 
 it may not be possible to generalize the results we found.
