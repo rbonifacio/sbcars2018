@@ -124,7 +124,7 @@ to implement this particular transformation (Figure \ref{fig:fig:runtime_qdm}), 
 that contains the required \emph{markups} for transforming \shc into \emph{low-level} Drools 
 rules. That is, for each \shc, the template engine populates the template, 
 resulting in a DRL rule consistent with the converted \shc.
-A code snippet of the template used for DRL generation can be seen in Appendix A. 
+% A code snippet of the template used for DRL generation can be seen in Appendix A. 
 
 The RHS of the Drools rule of Listing~\ref{code:drl}
 iterates over all selected military roles (that satisfy
@@ -224,7 +224,7 @@ using a Java test case requires more than 50 lines of imperative code.
 % Converting the \shc of Listing~\ref{code:dslExample}
 % leads to the \emph{low-level Drool rule} of Listing~\ref{code:drl}.
 
-Our typical test approach consists first in the specification of the required \callers in a \hlrdsl
+Our first test approach consists first in the specification of the required \callers in a \hlrdsl
 file. Next, the \emph{behavior under test} is detailed as features using
 the Cucumber~\cite{wynne2017cucumber} framework (we present an 
 example of a feature in Listing \ref{code:cucumber}). After that, the developer details 
@@ -268,7 +268,7 @@ to simulate the specification of rules, allowing a better understanding of the e
 %\end{figure}
 
 
-Our second approach for testing automatically generates test cases 
+Our second test approach automatically generates test cases 
 from our DSL and from a random sample of simple combinations that
 characterize artificial organizational unities. This \emph{property
 based approach} involves a custom Maven plugin that currently generates simple test cases, 
@@ -287,34 +287,34 @@ Java test scripts for generating QDMs.
 %  \caption{\it Maven plugin for test generation}
 %  \label{fig:pluginExample}
 %\end{figure}
-\begin{lstlisting}[frame=single, language=Plugin, caption={\it Maven plugin for test generation}, label={code:plugin}]
-<plugin>
-  <groupId>xxx</groupId>
-  <artifactId>xxx</artifactId>
-  <executions>
-    <execution>
-      <id>execute</id>			
-      <configuration>
-        <seed>10</seed>				
-        <qcs>702311,762314,575311</qcs>				
-      </configuration>
-      <goals>
-        <goal>generate</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>	
-\end{lstlisting}
+% \begin{lstlisting}[frame=single, language=Plugin, caption={\it Maven plugin for test generation}, label={code:plugin}]
+% <plugin>
+%   <groupId>xxx</groupId>
+%   <artifactId>xxx</artifactId>
+%   <executions>
+%     <execution>
+%       <id>execute</id>			
+%       <configuration>
+%         <seed>10</seed>				
+%         <qcs>702311,762314,575311</qcs>				
+%       </configuration>
+%       <goals>
+%         <goal>generate</goal>
+%       </goals>
+%     </execution>
+%   </executions>
+% </plugin>	
+% \end{lstlisting}
 
 In this second approach, for each of the possible combinations, we generate a \shc that meets the conditions 
 and a cucumber feature that exercises the \shc and compares the expected results declared in the feature. 
 Each \shc is considered during the generation of the QDM to the QCs specified in the 
-maven plugin (as shown in Listing~\ref{code:plugin}).
+maven plugin.% (as shown in Listing~\ref{code:plugin}).
 That is, to use this architecture characteristic (here we consider testability as an 
 architecture concern), we ``feed'' the maven plugin with a list of QC codes for which the QDMs should be generated, 
 besides other optional information, which have default values, such as: database connection string,
 seed to be used in the random selection of values within a combination (e.g., considering 20 different
-kinds of organizational units, randomly take 5 for generating the set of combinations), and the output directory 
+kinds of organizational unities, randomly take 5 for generating the set of combinations), and the output directory 
 where the code should be exported. 
 
 %\begin{figure}[!ht] \centering
@@ -353,11 +353,6 @@ Feature: QDM 757311
 		| 1051000006 | 74     |
 		| 1051000025 | 74     |
 
-	Scenario: Test 2
-		Given QC with code 757311
-		And HRL: 1, 2, 3
-		When I generate a QDM
-		And the results are inconsistent    
 \end{lstlisting}
 
 

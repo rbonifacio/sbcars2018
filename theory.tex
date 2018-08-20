@@ -1,19 +1,19 @@
-\section{Logistics Systems}
+\section{Military Logistics Systems}
 \label{sec:logistics}
 
-Logistics is the method used to implement military strategies and tactics as a method to gain 
+Military Logistics is the method used to implement military strategies and tactics as a method to gain 
 competitive advantage~\cite{rutner2012}. Logistics is defined as the art of moving armies, 
 as well as accommodating and supplying the military~\cite{prebilic2006}. Strategy and tactics 
 provide the framework for conducting military operations, while logistics provides the means.
-In the context of this paper, we are more interested in the supplying aspects of logistics. 
-The logistics supplying function refers to the set of activities that deals with the  provisioning of 
+In the context of this paper, we are more interested in the supplying aspects of logistics, which 
+refers to the set of activities that deals with the  provisioning of 
 the material of different classes (including vehicles, armaments, munition, uniform, and fuel) necessary to the 
 military unities (including a rich organizational structure and a huge number of soldiers). 
 
 In order to facilitate the administration and control of materials and equipment, the Brazilian Army uses a 
 catalog system that is similar to one defined by the North Atlantic Treaty Organization (OTAN)~\cite{otan2012}, 
-which classifies items into groups and classes. Instead, to support the provisioning of materials and equipment, 
-the Brazilian Army catalog uses a classification that considers the \emph{type}, \emph{class}, and \emph{family} of the 
+which classifies items into groups and classes. 
+The Brazilian Army catalog uses a classification that considers the \emph{type}, \emph{class}, and \emph{family} of the 
 materials, ignoring some details (such as specific brands and suppliers). More detailed information is considered by 
 other areas of the logistic system. Several rules govern the identification of materials and equipment, 
 to avoid duplication and simplify the process of decision making. A logistic system is the integrated set of organizations, 
@@ -22,7 +22,7 @@ This is a complex system, and thus must be organized in different modules.
 
 In this paper we present the main design and architectural decisions related to one of the modules (SISDOT) of the \emph{Integrated 
 Logistics System} (SIGELOG) of the Brazilian Army. SISDOT deals with the identification of the necessary 
-materials and equipment (hereafter MEMs) for the organizational units of the Brazilian Army. Each organizational 
+materials and equipment (hereafter MEMs) for the organizational unities of the Brazilian Army. Each organizational 
 unity is a combination of a set of \emph{generic organizations of specific types}, which describes the expected 
 number of military unities of an organization (including armies, divisions, brigades, and so on). The goal of 
 SISDOT is to estimate the set of MEMs that should be assigned to a generic organization, producing 
@@ -33,7 +33,7 @@ Before generating a QDM, it is necessary to catalog all relevant MEMs to a given
 class of materials and then specify \callers (HLRs) that relate MEMs to the generic organizational 
 unities, considering different elements of the structure---from the type of the unity and 
 sub-unities to the qualifications of a soldier. That is, it is possible to elaborate a 
-\shc that states that a military ambulance would be assigned to all \emph{drivers within medical units}. 
+\shc that states that a military ambulance would be assigned to all \emph{drivers within medical unities}. 
 Differently, it is also possible to state that an automatic rifle will be assigned to all \emph{sergeant that has 
 been qualified as a shooter}. There is some degree of flexibility for writing these 
 rules, that might be from two different kinds: rules that consider the entire structure 

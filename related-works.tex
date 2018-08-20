@@ -1,5 +1,5 @@
 \section{Related Work}
-\label{sec:related_works}
+\label{sec:related}
 
 We addressed the main architectural concerns of SISDOT 
 using well-known patterns for enterprise
@@ -17,9 +17,9 @@ Drools provides greater expressiveness when compared to the other
 approach. Our decision to use Drools to implement
 low-level rules was mostly based on its integration to
 the JEE platform, instead of its expressiveness.
-We also considered the use of Prolog for at least
-expressing the mechanics of the QDM generation, though
-we postponed this work to a future work.
+% We also considered the use of Prolog for at least
+% expressing the mechanics of the QDM generation, though
+% we postponed this work to a future work.
 
 Dingcheng Li and colleagues report on the use of the
 Drools engine to model and reason about \emph{electronic
@@ -35,8 +35,17 @@ using Drools~\cite{jung2011executing}. They also used a model-to-model appraoch
 implemented using XSLT. Our approach could also be characterized
 as being based on \emph{model-to-model transformations}, since we translate
 a business entity model (represented as the \callers Java
-domain objects in runtime) into Drools rules, though using FreeMarker as 
-template engine. The work of Ostermayer et al. also advocates
-the use of DSLs + template engines to generate Drools
-rules~\cite{toostermayer2013simplifying}.
+domain objects at runtime) into Drools rules, though using FreeMarker as 
+template engine.
+% The work of Ostermayer et al. also advocates
+% the use of DSLs + template engines to generate Drools
+% rules~\cite{toostermayer2013simplifying}.
 
+Several DSLs have been proposed to support test activities.
+For instance, Mugridge and Cunningham present the \emph{Fit
+Framework for Integrated Tests}, which is based on a DSL~\cite{Mugridge:2005:FDS:1051337}
+The Cucumber framework also uses a DSL for expressing
+the expected behavior of software features~\cite{Wynne:2012:CBB:2331446}. Here, we
+designed a small DSL to reduce the effort for setting up
+a suite of acceptance tests (based on Cucumber) for QDM generation, particularly helping
+the test team to specify \callers. 

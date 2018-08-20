@@ -2,12 +2,12 @@
 
 % Uma das fases da Logística de Materiais de Emprego Militar das Forças Armadas contempla o planejamento da distribuição de materiais para todas as unidades militares. Essa fase é conhecida como Dotação de Materiais, e envolve a catalogação de materiais, muitas vezes independente de fornecedor, a definição de regras que associam materiais de emprego militar a unidades organizacionais (por exemplo, diretorias, departamentos, batalhões e cargos militares) e a execução das regras para derivar os materiais inicialmente previstos para cada unidade militar e os materiais que devem ser realmente distribuídos para as organizações militares, os quais podem sofrer variações dadas as inclusões e supressões de cargos de uma determinada unidade organizacional do Exército Brasileiro.
 
-One of the logistics' phases to distribute equipment to an army force contemplates the \emph{distribution planning} of materials throughout military units. This phase is known as \emph{material endowment}, and involves several steps, including the specification of 
-relevant materials, often independent of vendor; the definition of rules that link military materials and equipment's to organizational units (e.g., departments, regiments, and military posts); the execution of the rules for deriving the materials originally intended for each \emph{abstract military unit}; and the designation of the materials that must be actually distributed to the \emph{concrete military organizations}, which may suffer variations due to the inclusion and suppression of positions for a particular organizational unit of an army force. In the context of this paper, the reader might consider the scenario of the Brazilian Army. 
+One of the logistics' phases to distribute equipment to an army force contemplates the \emph{distribution planning} of materials throughout military unities. This phase is known as \emph{material endowment}, and involves several steps, including the specification of 
+relevant materials, often independent of vendor; the definition of rules that link military materials and equipment's to organizational unities (e.g., departments, regiments, and military posts); the execution of the rules for deriving the materials originally intended for each \emph{abstract military unit}; and the designation of the materials that must be actually distributed to the \emph{concrete military organizations}, which may suffer variations due to the inclusion and suppression of positions for a particular organizational unit of an army force. In the context of this paper, the reader might consider the scenario of the Brazilian Army. 
  
 % Sistemas de software de apoio à decisão tornam-se essenciais neste contexto, dada à importância e complexidade dos processos relacionados à Dotação de Materiais de Emprego Militar. Particularmente, as regras usadas para derivar à previsão de material e material previsto não são triviais, e quando implementadas diretamente no código fonte, tornam o sistema difícil de compreender e manter, uma vez que a quantidade de condições que precisam ser expressas é  proporcional à estrutura das unidades organizacionais. Além disso, uma solução "\emph{hard-coding}" não permite aos especialistas do domínio especificarem, de forma trivial, novas regras de derivação. Por essa razão, a externalização das regras de derivação voltadas para a dotação de material é preferencialmente implementada de forma declarativa (e não operacionalmente em uma linguagem de programação como C++ ou Java), usando linguagens, ferramentas ou bibliotecas que suportam algum motor de regras de negócio (\emph{business rule engines}).
 
-Decision support systems are essential in this domain, given the importance and complexity of the processes related to the allocation of military employment materials. In particular, the rules used to predict military materials and equipment are not trivial, and implementing these rules directly in the source code makes the systems difficult to understand and maintain. This problem mostly occurs because the number of conditions that need to be expressed is proportional to the complexity of the organizational structure and the number of materials. In the case of an entire army force, this number is noteworthy. In addition, a "\emph{hard-coding}" solution does not allow domain experts to trivially specify and test new derivation rules. For these reasons, it is preferably to implement these rules declaratively, using languages, tools, or libraries that support some sort of inference mechanism.
+Decision support systems are essential in this domain, given the importance and complexity of the processes related to the allocation of military employment materials. In particular, the rules used to predict military materials and equipment are not trivial, and implementing these rules directly in the source code makes the systems difficult to understand and maintain. This problem mostly occurs because the number of conditions that need to be expressed is proportional to the complexity of the organizational structure and the number of materials. In the case of an entire army force, this number is noteworthy. In addition, a ``\emph{hard-coding}'' solution does not allow domain experts to trivially specify and test new derivation rules. For these reasons, it is preferably to implement these rules declaratively, using languages, tools, or libraries that support some sort of inference mechanism.
 
 % Por outro lado, a introdução de linguagens como Prolog~\cite{clocksin2003programming} ou bibliotecas como  Drools~\cite{amador2012}, \cite{bali2009}, \cite{bali2013}, \cite{browne2009} em ambientes corporativos pode sofrer algum tipo de rejeição, particularmente em ambientes cuja arquitetura de sistemas corporativos é bem estabelecida. Além disso, essas soluções requerem uma curva razoável de  aprendizagem, o que pode prejudicar atividades de manutenção de software. 
 
@@ -19,7 +19,7 @@ constraints related to both language and libraries usage. Furthermore, these sol
 
 This article describes the main design and architectural decisions adopted to implement the mechanisms that assist 
 decision makers to plan the distribution of military materials and equipment across the organizational structure 
-of the Brazilian Army. These decisions aim to both (a) abstract the adoption of a business rule engine using {\bf metaprogramming} 
+of the Brazilian Army. These decisions aim to both (a) abstract the adoption of a business rule engine using {\bf meta-programming} 
 and (b) allow domain experts to simulate the definition and testing of rules using 
 a {\bf domain specific language}. Accordingly, this paper presents the following contributions:
 
@@ -27,7 +27,7 @@ a {\bf domain specific language}. Accordingly, this paper presents the following
 %   \item O uso de técnicas de programação generativa para o projeto arquitetural e implementação do mecanismo de derivação de materiais e materiais previstos para unidades organizacionais.
 \item A description of the use of generative programming techniques to raise the abstraction level 
  related to the adoption of a logic programming language in the specification of rules for the 
- distribution of materials and equipment through organizational units.
+ distribution of materials and equipment through organizational unities.
 
 % \item O relato da análise da arquitetura proposta, que reforça que as decisões arquiteturais tomadas foram adequadas e atendem às necessidades dos especialistas do domínio e às restrições técnicas do ambiente corporativo, gerando automaticamente as regras de distribuição de materiais.
 \item A report of an empirical evaluation of our design and architectural decisions, reinforcing that they fulfill 
@@ -44,9 +44,11 @@ Although we discuss the distribution of materials and equipment for the military
 We organized this article as follows. Section \ref{sec:logistics} presents the concepts 
 related to the domain of material logistics. Section~\ref{sec:rbs} presents the concepts 
 related to business rules and rule based engines and Section~\ref{sec:gp} presents some 
-background information related to \emph{generative programming}---techniques that we use to support our 
-design and implementation. Section~\ref{sec:architecture} presents the design and architectural decisions we take 
+background information related to \emph{generative programming}---techniques that we use to support the 
+design and implementation of our approach. Section~\ref{sec:architecture}
+presents the main design and architectural decisions we take 
 to develop the mechanism responsible for the distribution of materials. In Section~\ref{sec:case_study} we present the 
-results of an empirical study that validate our approach. Finally, Section~\ref{sec:conclusao} presents some final 
+results of an empirical study that validate our approach. Finally, Section~\ref{sec:related} and
+Section~\ref{sec:conclusao} relate our work with the exising literature and present some final 
 remarks. 
 
